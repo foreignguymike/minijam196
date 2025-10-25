@@ -11,6 +11,10 @@ public class Constants {
     public static final int SWIDTH = WIDTH * SCALE;
     public static final int SHEIGHT = HEIGHT * SCALE;
 
+    public static final int NUM_ROWS = 18;
+    public static final int NUM_COLS = 32;
+    public static final int TILE_SIZE = 20;
+
     public static final boolean FULLSCREEN = false;
 
     // Endesga 32 https://lospec.com/palette-list/endesga-32
@@ -49,33 +53,13 @@ public class Constants {
         Color.valueOf("c28569"), // 31
     };
 
-    public static final Color TITLE_BG = COLORS[17];
-    public static final Color SLIME_BG = COLORS[22];
+    public static final Color DARK_GREEN = COLORS[14];
+    public static final Color VERY_DARK_GREEN = COLORS[15];
 
-    public static final Color RESULTS_BG = COLORS[30];
-    public static final Color RESULTS_SLIME_BG = COLORS[31];
-
-    public static final Color SUBMIT_BG = COLORS[12];
-    public static final Color SUBMIT_SLIME_BG = COLORS[13];
-
-    public static final Color LIGHT = COLORS[19];
-    public static final Color DARK = COLORS[24];
-    public static final Color DARK_GRAY = COLORS[23];
     public static final Color GRAY = COLORS[22];
-    public static final Color RED = COLORS[26];
-    public static final Color GREEN = COLORS[12];
-    public static final Color BLUE = COLORS[17];
-    public static final Color YELLOW = COLORS[11];
-    public static final Color PURPLE = COLORS[27];
-
+    public static final Color DARK_GRAY = COLORS[23];
+    public static final Color VERY_DARK_GRAY = COLORS[24];
     public static final Color BLACK = COLORS[25];
     public static final Color WHITE = COLORS[19];
-    public static final Color GRASS = COLORS[12];
-    public static final Color SKY = COLORS[18];
-    public static final Color SHADOW = COLORS[4];
-
-    public static final Color MESSAGE_BLACK = COLORS[25];
-    public static final Color MESSAGE_VALID = COLORS[13];
-    public static final Color MESSAGE_INVALID = COLORS[7];
 
 }

@@ -8,6 +8,8 @@ import java.util.List;
 
 public class Snake extends GridEntity {
 
+    private final int maxEnergy = 5;
+    public int energy = 5;
     private final List<SnakeEntity> bodies;
 
     public Snake(Context context) {
@@ -32,13 +34,14 @@ public class Snake extends GridEntity {
         SnakeEntity head = bodies.get(0);
         Direction direction = getDirection(head.row, head.col, head.row + dr, head.col + dc);
         head.setDest(head.row + dr, head.col + dc, direction);
+        updateDirections();
     }
 
     private void moveBodies() {
         for (int i = bodies.size() - 2; i >= 0; i--) {
             SnakeEntity next = bodies.get(i);
             SnakeEntity curr = bodies.get(i + 1);
-            curr.setDest(next.row, next.col, getDirection(curr.row, curr.col, next.row, next.col));
+            curr.setDest(next.row, next.col);
         }
     }
 

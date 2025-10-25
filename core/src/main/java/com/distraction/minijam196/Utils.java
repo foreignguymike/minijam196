@@ -6,6 +6,16 @@ import com.badlogic.gdx.math.MathUtils;
 
 public class Utils {
 
+    public static void drawCentered(SpriteBatch sb, TextureRegion image, float x, float y) {
+        sb.draw(
+            image,
+            x - image.getRegionWidth() / 2f,
+            y - image.getRegionHeight() / 2f,
+            image.getRegionWidth(),
+            image.getRegionHeight()
+        );
+    }
+
     public static void drawRotated(SpriteBatch sb,  TextureRegion image, float x, float y, float rad) {
         sb.draw(
             image,

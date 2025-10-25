@@ -44,6 +44,10 @@ public abstract class Screen {
         out = new Transition(context, Transition.Type.CHECKERED_OUT, 0.5f);
     }
 
+    public void unproject() {
+        cam.unproject(m);
+    }
+
     public void resume() {
     }
 

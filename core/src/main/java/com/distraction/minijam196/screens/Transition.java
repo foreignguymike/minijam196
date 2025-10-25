@@ -80,8 +80,7 @@ public class Transition {
     }
 
     public void update(float dt) {
-        if (!start) return;
-        if (done) return;
+        if (!start || done) return;
         time += dt;
         if (type == Type.PAN) {
             cam.position.x = MathUtils.map(0, duration, camStart.x, camEnd.x, time);
@@ -102,7 +101,8 @@ public class Transition {
     }
 
     public void render(SpriteBatch sb) {
-        if (!start) return;
+        if (!start || done) return;
+
         sb.setColor(Constants.BLACK);
         float squareSize = Constants.WIDTH / 16f;
         int numRows = MathUtils.ceil(Constants.HEIGHT / squareSize);

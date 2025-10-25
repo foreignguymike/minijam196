@@ -1,12 +1,15 @@
 package com.distraction.minijam196.entity;
 
-import com.badlogic.gdx.graphics.Color;
+import static com.distraction.minijam196.Constants.TILE_SIZE;
+
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.distraction.minijam196.Context;
 import com.distraction.minijam196.Utils;
 
 public class SnakeEntity extends GridEntity {
+
+    private static final float SPEED = 300;
 
     protected TextureRegion image;
 
@@ -15,10 +18,10 @@ public class SnakeEntity extends GridEntity {
     public SnakeEntity(Context context, int row, int col) {
         this.row = row;
         this.col = col;
-        x = col * 20;
-        y = row * 20;
-        dx = 300;
-        dy = 300;
+        x = col * TILE_SIZE;
+        y = row * TILE_SIZE;
+        dx = SPEED;
+        dy = SPEED;
         direction = Direction.RIGHT;
 
         image = context.getImage("greensnakebody");
@@ -32,8 +35,8 @@ public class SnakeEntity extends GridEntity {
 
     @Override
     public void update(float dt) {
-        float destx = col * 20;
-        float desty = row * 20;
+        float destx = col * TILE_SIZE;
+        float desty = row * TILE_SIZE;
         if (x < destx) {
             x += dx * dt;
             if (x > destx) x = destx;
@@ -54,7 +57,7 @@ public class SnakeEntity extends GridEntity {
 
     @Override
     public void render(SpriteBatch sb) {
-        sb.setColor(Color.WHITE);
-        Utils.drawRotated(sb, image, x + 10, y + 10, direction.rad);
+        sb.setColor(1, 1, 1, 1);
+        Utils.drawRotated(sb, image, x + TILE_SIZE / 2f, y + TILE_SIZE / 2f, direction.rad);
     }
 }

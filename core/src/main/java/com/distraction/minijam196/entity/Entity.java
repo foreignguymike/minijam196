@@ -8,8 +8,26 @@ abstract class Entity {
     public float y;
     public float dx;
     public float dy;
+    public float w;
+    public float h;
 
-    public abstract void update(float dt);
-    public abstract void render(SpriteBatch sb);
+    public boolean contains(float x, float y) {
+        return contains(x, y, 0, 0);
+    }
+
+    public boolean contains(float x, float y, float px, float py) {
+        return x > this.x - w / 2 - px
+            && x < this.x + w / 2 + px
+            && y > this.y - h / 2 - py
+            && y < this.y + h / 2 + py;
+    }
+
+    public void update(float dt) {
+
+    }
+
+    public void render(SpriteBatch sb) {
+
+    }
 
 }

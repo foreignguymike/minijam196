@@ -1,0 +1,9 @@
+minijam196.png
+size:64,32
+repeat:none
+greensnakebody
+bounds:24,5,20,20
+greensnakehead
+bounds:2,5,20,20
+pixel
+bounds:2,2,1,1

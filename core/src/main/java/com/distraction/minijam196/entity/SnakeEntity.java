@@ -9,7 +9,7 @@ import com.distraction.minijam196.Utils;
 
 public class SnakeEntity extends GridEntity {
 
-    private static final float SPEED = 300;
+    private static final float SPEED = 150;
 
     protected TextureRegion image;
 

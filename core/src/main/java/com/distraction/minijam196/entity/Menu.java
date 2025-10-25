@@ -82,10 +82,10 @@ public class Menu extends Entity {
         cam.unproject(m);
 
         if (Gdx.input.justTouched()) {
-            if (upButton.contains(m.x, m.y)) player.move(snakes, 1, 0);
-            if (downButton.contains(m.x, m.y)) player.move(snakes, -1, 0);
-            if (leftButton.contains(m.x, m.y)) player.move(snakes, 0, -1);
-            if (rightButton.contains(m.x, m.y)) player.move(snakes, 0, 1);
+            if (upButton.contains(m.x, m.y)) player.move(1, 0);
+            if (downButton.contains(m.x, m.y)) player.move(-1, 0);
+            if (leftButton.contains(m.x, m.y)) player.move(0, -1);
+            if (rightButton.contains(m.x, m.y)) player.move(0, 1);
             if (endTurnButton.contains(m.x, m.y)) endTurn.callback();
         }
     }

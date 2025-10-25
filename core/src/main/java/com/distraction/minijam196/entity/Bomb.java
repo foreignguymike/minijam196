@@ -4,14 +4,15 @@ import static com.distraction.minijam196.Constants.TILE_SIZE;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.distraction.minijam196.Context;
 
 public class Bomb extends GridEntity {
 
     public enum BombType {
-        BOMB("bomb", 4),
-        CROSS("crossbomb", 4),
-        DCROSS("dcrossbomb", 4);
+        BOMB("bomb", 5),
+        CROSS("crossbomb", 5),
+        DCROSS("dcrossbomb", 5);
 
         public String name;
         public int delay;
@@ -23,23 +24,19 @@ public class Bomb extends GridEntity {
 
     }
 
-    private static final float SPEED = 200;
-
     private final TextureRegion image;
 
     public final BombType type;
     public int countdown;
 
-    private final int startRow;
-    private final int startCol;
+    private float totalDist;
+    private float jumpy;
 
     private final TextEntity countdownText;
 
     public Bomb(Context context, BombType type, int startRow, int startCol) {
         this.type = type;
         this.countdown = type.delay;
-        this.startRow = startRow;
-        this.startCol = startCol;
         x = startCol * TILE_SIZE;
         y = startRow * TILE_SIZE;
 
@@ -52,11 +49,17 @@ public class Bomb extends GridEntity {
         super.setDest(row, col);
         dx = col * TILE_SIZE - x;
         dy = row * TILE_SIZE - y;
-        float dist = (float) Math.sqrt(dx * dx + dy * dy);
-        dx *= SPEED / dist;
-        dy *= SPEED / dist;
+        totalDist = calculateDistance(x, y, col * TILE_SIZE, row * TILE_SIZE);
+        dx *= 2;
+        dy *= 2;
         dx = Math.abs(dx);
         dy = Math.abs(dy);
+    }
+
+    private float calculateDistance(float x1, float y1, float x2, float y2) {
+        float dx = x2 - x1;
+        float dy = y2 - y1;
+        return (float) Math.sqrt(dx * dx + dy * dy);
     }
 
     public void countdown() {
@@ -67,14 +70,19 @@ public class Bomb extends GridEntity {
     @Override
     public void update(float dt) {
         moveToDestination(dt);
+
+        float distLeft = calculateDistance(x, y, col * TILE_SIZE, row * TILE_SIZE);
+        float percent = distLeft / totalDist;
+        jumpy = MathUtils.sin(MathUtils.PI * percent) * 70;
+
         countdownText.x = x + 9;
-        countdownText.y = y + 9;
+        countdownText.y = y + jumpy + 9;
     }
 
     @Override
     public void render(SpriteBatch sb) {
         sb.setColor(1, 1, 1, 1);
-        sb.draw(image, x, y);
+        sb.draw(image, x, y + jumpy);
         countdownText.render(sb);
     }
 }

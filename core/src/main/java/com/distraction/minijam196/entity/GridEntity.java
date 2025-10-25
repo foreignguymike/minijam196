@@ -2,7 +2,7 @@ package com.distraction.minijam196.entity;
 
 import static com.distraction.minijam196.Constants.TILE_SIZE;
 
-abstract class GridEntity extends Entity {
+public abstract class GridEntity extends Entity {
 
     public int row;
     public int col;

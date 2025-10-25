@@ -36,7 +36,6 @@ public class PlayScreen extends Screen {
 
     private int currentTurnIndex = 0;
     private TurnPhase turnPhase = TurnPhase.BOMBS;
-    private float timer = 0;
 
     public PlayScreen(Context context) {
         super(context);
@@ -47,19 +46,23 @@ public class PlayScreen extends Screen {
             in.start();
         }
 
+        snakes = new ArrayList<>();
+        bombs = new ArrayList<>();
+
         List<SnakeEntity> bodies = new ArrayList<>();
-        bodies.add(new SnakeHead(context, 10, 7, Direction.RIGHT));
-        bodies.add(new SnakeEntity(context, 10, 6));
+        bodies.add(new SnakeHead(context, 9, 6, Direction.RIGHT));
+        bodies.add(new SnakeEntity(context, 9, 5));
         bodies.add(new SnakeEntity(context, 10, 5));
         bodies.add(new SnakeEntity(context, 10, 4));
         bodies.add(new SnakeEntity(context, 10, 3));
-        bodies.add(new SnakeEntity(context, 10, 2));
+        bodies.add(new SnakeEntity(context, 9, 3));
+        bodies.add(new SnakeEntity(context, 8, 3));
+        bodies.add(new SnakeEntity(context, 8, 2));
+        bodies.add(new SnakeEntity(context, 8, 1));
+        bodies.add(new SnakeEntity(context, 9, 1));
         bodies.add(new SnakeEntity(context, 10, 1));
-        bodies.add(new SnakeEntity(context, 10, 0));
-        bodies.add(new SnakeEntity(context, 11, 0));
-        bodies.add(new SnakeEntity(context, 12, 0));
-        bodies.add(new SnakeEntity(context, 13, 0));
-        player = new Snake(context, bodies);
+        player = new Snake(context, snakes, bodies, bombs);
+        snakes.add(player);
 
         bodies = new ArrayList<>();
         bodies.add(new SnakeHead(context, 10, 17, Direction.LEFT));
@@ -73,28 +76,27 @@ public class PlayScreen extends Screen {
         bodies.add(new SnakeEntity(context, 12, 23));
         bodies.add(new SnakeEntity(context, 13, 23));
         bodies.add(new SnakeEntity(context, 14, 23));
+        snakes.add(new Snake(context, snakes, bodies, bombs));
 
-        snakes = new ArrayList<>();
-        snakes.add(player);
-        snakes.add(new Snake(context, bodies));
-
-        bombs = new ArrayList<>();
-
-        menu = new Menu(context, player, snakes, () -> {
-            snakes.get(currentTurnIndex).canBomb = true;
-            currentTurnIndex++;
-            if (currentTurnIndex == snakes.size()) currentTurnIndex = 0;
-            for (Bomb bomb : bombs) bomb.countdown();
-        });
+        menu = new Menu(context, player, snakes, this::nextTurn);
 
         cursor = new ImageButton(context.getImage("cursor"));
+    }
+
+    private void nextTurn() {
+        currentTurnIndex++;
+        if (currentTurnIndex == snakes.size()) currentTurnIndex = 0;
+        snakes.get(currentTurnIndex).startTurn();
+
+        turnPhase = TurnPhase.BOMBS;
+        for (Bomb bomb : bombs) bomb.countdown();
     }
 
     @Override
     public void input() {
         if (ignoreInput) return;
 
-        if (snakes.get(currentTurnIndex) != player) return;
+        if (!isPlayerTurn()) return;
 
         menu.input();
 
@@ -110,10 +112,14 @@ public class PlayScreen extends Screen {
 
         if (Gdx.input.justTouched()) {
             if (cursor.x >= 0) {
-                player.bomb(bombs, (int) (cursor.y / TILE_SIZE), (int) (cursor.x / TILE_SIZE));
+                player.bomb((int) (cursor.y / TILE_SIZE), (int) (cursor.x / TILE_SIZE));
             }
         }
 
+    }
+
+    private boolean isPlayerTurn() {
+        return snakes.get(currentTurnIndex) == player;
     }
 
     @Override
@@ -122,19 +128,34 @@ public class PlayScreen extends Screen {
         out.update(dt);
 
         menu.update(dt);
-        menu.waiting = snakes.get(currentTurnIndex) != player;
+        menu.waiting = !isPlayerTurn();
 
         if (turnPhase == TurnPhase.BOMBS) {
+            List<Bomb> explodingBombs = new ArrayList<>();
             for (int i = bombs.size() - 1; i >= 0; i--) {
                 Bomb bomb = bombs.get(i);
                 if (bomb.countdown == 0) bombs.remove(i);
+                explodingBombs.add(bomb);
             }
+//            if (explodingBombs.isEmpty()) {
+                turnPhase = TurnPhase.ACTION;
+//            }
         } else {
-
+            if (!isPlayerTurn()) {
+                Snake bot = snakes.get(currentTurnIndex);
+                if (bot.ready) {
+                    if (!bot.next()) {
+                        nextTurn();
+                    }
+                }
+            }
         }
 
         player.update(dt);
-        for (Snake s : snakes) s.update(dt);
+        for (Snake s : snakes) {
+            if (s == player) continue;
+            s.update(dt);
+        }
     }
 
     @Override
@@ -143,7 +164,6 @@ public class PlayScreen extends Screen {
 
         sb.setProjectionMatrix(cam.combined);
 
-        // field
         sb.setColor(Constants.VERY_DARK_GREEN);
         sb.draw(pixel, 0, 0, WIDTH, HEIGHT);
         sb.setColor(Constants.DARK_GREEN);
@@ -156,9 +176,10 @@ public class PlayScreen extends Screen {
         }
         cursor.render(sb);
 
-        // snake
         player.render(sb);
         for (Snake s : snakes) s.render(sb);
+
+        for (Bomb b : bombs) b.render(sb);
 
         menu.render(sb);
 

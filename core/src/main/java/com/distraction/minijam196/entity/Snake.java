@@ -1,6 +1,10 @@
 package com.distraction.minijam196.entity;
 
+import static com.distraction.minijam196.Constants.NUM_COLS;
+import static com.distraction.minijam196.Constants.NUM_ROWS;
+
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.distraction.minijam196.Context;
 
 import java.util.ArrayList;
@@ -10,55 +14,223 @@ public class Snake extends GridEntity {
 
     private final Context context;
 
-    private final int maxEnergy = 8;
+    private final int maxEnergy = 6;
     public int energy = maxEnergy;
+    private final List<Snake> snakes;
     private final List<SnakeEntity> bodies = new ArrayList<>();
+    private final List<Bomb> bombs;
 
-    public boolean ready;
+    public boolean ready; // bot only
     private Bomb bomb;
-    public boolean canBomb = true;
+    public int maxBombs = 1;
+    public int bombsRemaining = maxBombs;
+    private final float range = 5;
 
-    public Snake(Context context, List<SnakeEntity> bodies) {
+    public Snake(Context context, List<Snake> snakes, List<SnakeEntity> bodies, List<Bomb> bombs) {
         this.context = context;
+        this.snakes = snakes;
         this.bodies.addAll(bodies);
+        this.bombs = bombs;
         updateDirections();
         ready = true;
     }
 
-    public void next() {
-
+    public void startTurn() {
+        energy = maxEnergy;
+        bombsRemaining = maxBombs;
     }
 
-    public void move(List<Snake> snakes, int dr, int dc) {
-        if (energy <= 0) return;
+    /**
+     * @return false if end turn
+     */
+    public boolean next() {
+        if (bombsRemaining == 0 && energy == 0) return false;
+
         SnakeEntity head = bodies.get(0);
-        for (Snake snake : snakes) {
-            for (SnakeEntity body : snake.bodies) {
-                if (body.row == head.row + dr && body.col == head.col + dc) return;
+
+        if (bombsRemaining > 0) {
+            SnakeEntity se = getClosestSnakeEntity();
+            int dr = se.row - head.row;
+            int dc = se.col - head.col;
+            if (Math.abs(dr) + Math.abs(dc) <= range) {
+                if (!tryBomb(se.row, se.col)) {
+                    Bomb cb = getClosestBomb();
+                    return moveAwayFrom(cb) || moveAwayFrom(se);
+                }
+            } else {
+                if (!moveTowards(se)) {
+                    if (!tryBomb(se.row, se.col)) {
+                        Bomb cb = getClosestBomb();
+                        return moveAwayFrom(cb) || moveAwayFrom(se);
+                    }
+                }
+            }
+        } else {
+            Bomb cb = getClosestBomb();
+            if (cb != null) {
+                return moveAwayFrom(cb);
+            } else {
+                SnakeEntity se = getClosestSnakeEntity();
+                return moveAwayFrom(se);
             }
         }
+        return true;
+    }
+
+    private boolean moveTowards(GridEntity other) {
+        SnakeEntity head = bodies.get(0);
+        int dr = other.row - head.row;
+        int dc = other.col - head.col;
+        if (Math.abs(dr) > Math.abs(dc)) {
+            if (dr > 0 && move(1, 0)) return true;
+            if (dr < 0 && move(-1, 0)) return true;
+            if (dc > 0 && move(0, 1)) return true;
+            return dc < 0 && move(0, -1);
+        } else {
+            if (dc > 0 && move(0, 1)) return true;
+            if (dc < 0 && move(0, -1)) return true;
+            if (dr > 0 && move(1, 0)) return true;
+            return dr < 0 && move(-1, 0);
+        }
+    }
+
+    public boolean moveAwayFrom(GridEntity other) {
+        SnakeEntity head = bodies.get(0);
+        int dr = other.row - head.row;
+        int dc = other.col - head.col;
+        if (Math.abs(dr) > Math.abs(dc)) {
+            if (dr >= 0 && move(-1, 0)) return true;
+            if (dr < 0 && move(1, 0)) return true;
+            if (dc >= 0 && move(0, -1)) return true;
+            return dc < 0 && move(0, 1);
+        } else {
+            if (dc >= 0 && move(0, -1)) return true;
+            if (dc < 0 && move(0, 1)) return true;
+            if (dr >= 0 && move(-1, 0)) return true;
+            return dr < 0 && move(1, 0);
+        }
+    }
+
+    private Bomb getClosestBomb() {
+        SnakeEntity head = bodies.get(0);
+        Bomb cb = null;
+        int d = 100;
+        for (Bomb b : bombs) {
+            int dist = Math.abs(b.row - head.row) + Math.abs(b.col - head.col);
+            if (d > dist) {
+                d = dist;
+                cb = b;
+            }
+        }
+        return cb;
+    }
+
+    private SnakeEntity getClosestSnakeEntity() {
+        SnakeEntity head = bodies.get(0);
+        SnakeEntity se = null;
+        int d = 100;
+        for (Snake s : snakes) {
+            if (this == s) continue;
+            List<SnakeEntity> bodies = s.bodies;
+            for (SnakeEntity b : bodies) {
+                int dist = Math.abs(b.row - head.row) + Math.abs(b.col - head.col);
+                if (d > dist) {
+                    d = dist;
+                    se = b;
+                }
+            }
+        }
+        return se;
+    }
+
+    public boolean move(int dr, int dc) {
+        if (energy <= 0) return false;
+        SnakeEntity head = bodies.get(0);
+        int nr = bodies.get(0).row + dr;
+        int nc = bodies.get(0).col + dc;
+        if (!isValid(nr, nc)) return false;
         moveBodies();
         Direction direction = getDirection(head.row, head.col, head.row + dr, head.col + dc);
         head.setDest(head.row + dr, head.col + dc, direction);
         updateDirections();
         energy--;
+        return true;
     }
 
-    public void bomb(List<Bomb> bombs) {
-        if (canBomb) {
-            canBomb = false;
-            bomb = new Bomb(context, Bomb.BombType.BOMB, bodies.get(0).row, bodies.get(0).col);
-            bombs.add(bomb);
+    public boolean tryBomb(int tr, int tc) {
+        if (bombsRemaining > 0 && bomb == null) {
+            SnakeEntity head = bodies.get(0);
+            int dr = tr - head.row;
+            int dc = tc - head.col;
+            int dist = Math.abs(dr) + Math.abs(dc);
+            if (dist > range) {
+                float scale = range / dist;
+                dr = MathUtils.round(dr * scale);
+                dc = MathUtils.round(dc * scale);
+                tr = head.row + dr;
+                tc = head.col + dc;
+            }
+
+            if (isValid(tr, tc)) {
+                bombsRemaining--;
+                bomb = new Bomb(context, Bomb.BombType.BOMB, head.row, head.col);
+                bomb.setDest(tr, tc);
+                return true;
+            }
+
+            for (int radius = 1; radius < range; radius++) {
+                for (int dy = -radius; dy <= radius; dy++) {
+                    int dx = radius - Math.abs(dy);
+                    int[] tryRows = {tr + dy, tr + dy};
+                    int[] tryCols = {tc + dx, tc - dx};
+                    for (int i = 0; i < 2; i++) {
+                        int r = tryRows[i];
+                        int c = tryCols[i];
+                        dist = Math.abs(r - head.row) + Math.abs(c - head.col);
+                        if (dist > range) continue;
+                        if (isValid(r, c)) {
+                            bombsRemaining--;
+                            bomb = new Bomb(context, Bomb.BombType.BOMB, head.row, head.col);
+                            bomb.setDest(r, c);
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public void bomb(int tr, int tc) {
+        if (bombsRemaining > 0 && bomb == null) {
+            SnakeEntity head = bodies.get(0);
+            int dist = Math.abs(tr - head.row) + Math.abs(tc - head.col);
+            if (dist > range) return;
+            if (isValid(tr, tc)) {
+                bombsRemaining--;
+                bomb = new Bomb(context, Bomb.BombType.BOMB, head.row, head.col);
+                bomb.setDest(tr, tc);
+            }
         }
     }
 
-    public void bomb(List<Bomb> bombs, int row, int col) {
-        if (canBomb) {
-            canBomb = false;
-            bomb = new Bomb(context, Bomb.BombType.BOMB, bodies.get(0).row, bodies.get(0).col);
-            bomb.setDest(row, col);
-            bombs.add(bomb);
+    private boolean isValid(int row, int col) {
+        if (row < 0 || row >= NUM_ROWS || col < 0 || col >= NUM_COLS) {
+            return false;
         }
+        for (Snake s : snakes) {
+            for (SnakeEntity body : s.bodies) {
+                if (body.row == row && body.col == col) {
+                    return false;
+                }
+            }
+        }
+        for (Bomb bomb : bombs) {
+            if (bomb.row == row && bomb.col == col) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void moveBodies() {
@@ -96,7 +268,10 @@ public class Snake extends GridEntity {
 
         if (bomb != null) {
             bomb.update(dt);
-//            if (bomb.atDestination()) bomb = null;
+            if (bomb.atDestination()) {
+                bombs.add(bomb);
+                bomb = null;
+            }
         }
 
         ready = !moving && bomb == null;

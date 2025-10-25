@@ -6,29 +6,19 @@ import com.distraction.minijam196.Constants;
 import com.distraction.minijam196.Context;
 import com.distraction.minijam196.Utils;
 
-public class MenuItem extends Entity {
-
-    public enum MenuItemType {
-        TITLE,
-        ITEM
-    }
+public class TextButton extends Entity {
 
     private final Context context;
 
     public final TextEntity text;
 
-    public boolean enabled;
     private boolean hover;
     private boolean selected;
 
-    private final MenuItemType type;
     private TextureRegion image;
 
-    private float desty;
-
-    public MenuItem(Context context, MenuItemType type) {
+    public TextButton(Context context) {
         this.context = context;
-        this.type = type;
         text = new TextEntity(context.getFont(Context.VCR20), "", x, y, TextEntity.Alignment.CENTER);
         text.setColor(Constants.WHITE);
         updateImage();
@@ -42,31 +32,21 @@ public class MenuItem extends Entity {
     }
 
     public void setHover(boolean hover) {
-        if (type == MenuItemType.ITEM) {
-            this.hover = hover;
-            updateImage();
-        }
+        this.hover = hover;
+        updateImage();
     }
 
     public void toggleSelected() {
-        if (type == MenuItemType.ITEM) {
-            selected = !selected;
-            updateImage();
-        }
+        selected = !selected;
+        updateImage();
     }
 
     private void updateImage() {
         if (selected) image = context.getImage("menuitems");
         else if (hover) image = context.getImage("menuitemh");
-        else if (type == MenuItemType.TITLE) image = context.getImage("menutitle");
         else image = context.getImage("menuitem");
         w = image.getRegionWidth();
         h = image.getRegionHeight();
-    }
-
-    @Override
-    public void update(float dt) {
-
     }
 
     @Override

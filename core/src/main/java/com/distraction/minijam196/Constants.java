@@ -12,7 +12,7 @@ public class Constants {
     public static final int SHEIGHT = HEIGHT * SCALE;
 
     public static final int NUM_ROWS = 18;
-    public static final int NUM_COLS = 32;
+    public static final int NUM_COLS = 24;
     public static final int TILE_SIZE = 20;
 
     public static final boolean FULLSCREEN = false;

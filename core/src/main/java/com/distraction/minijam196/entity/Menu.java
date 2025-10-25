@@ -1,60 +1,120 @@
 package com.distraction.minijam196.entity;
 
+import static com.distraction.minijam196.Constants.DARK_GRAY;
 import static com.distraction.minijam196.Constants.HEIGHT;
+import static com.distraction.minijam196.Constants.NUM_COLS;
+import static com.distraction.minijam196.Constants.TILE_SIZE;
 import static com.distraction.minijam196.Constants.WIDTH;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.viewport.Viewport;
+import com.distraction.minijam196.Constants;
 import com.distraction.minijam196.Context;
+import com.distraction.minijam196.MyViewport;
+import com.distraction.minijam196.SimpleCallback;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Menu extends Entity {
 
-    private final List<MenuItem> menuItems;
+    protected Viewport viewport;
+    protected Camera cam;
+    protected final Vector3 m;
 
-    public Menu(Context context, Snake snake) {
+    private final Snake player;
+    private final List<Snake> snakes;
+
+    private final TextureRegion pixel;
+
+    private final TextEntity energyText;
+    private final TextEntity moveText;
+
+    private final ImageButton upButton;
+    private final ImageButton downButton;
+    private final ImageButton leftButton;
+    private final ImageButton rightButton;
+
+    private final TextButton endTurnButton;
+
+    private final SimpleCallback endTurn;
+
+    private final TextEntity waitingText;
+
+    public boolean waiting;
+
+    public Menu(Context context, Snake player, List<Snake> snakes, SimpleCallback endTurn) {
+        this.player = player;
+        this.snakes = snakes;
+        this.endTurn = endTurn;
+
         x = WIDTH / 2f;
         y = HEIGHT / 2f;
 
-        MenuItem title = new MenuItem(context, MenuItem.MenuItemType.TITLE);
-        title.text.setText("Energy 5");
-        MenuItem move = new MenuItem(context, MenuItem.MenuItemType.ITEM);
-        move.text.setText("Move");
-        MenuItem attack = new MenuItem(context, MenuItem.MenuItemType.ITEM);
-        attack.text.setText("Attack");
+        pixel = context.getPixel();
 
-        menuItems = new ArrayList<>();
-        menuItems.add(title);
-        menuItems.add(move);
-        menuItems.add(attack);
+        viewport = new MyViewport(Constants.WIDTH, Constants.HEIGHT);
+        cam = viewport.getCamera();
+        m = new Vector3();
 
-        updateMenuItems();
+        float menuCenter = WIDTH - (WIDTH - NUM_COLS * TILE_SIZE) / 2f;
+        energyText = new TextEntity(context.getFont(Context.VCR20), "Energy: " + player.energy, menuCenter, 300, TextEntity.Alignment.CENTER);
+        moveText = new TextEntity(context.getFont(Context.VCR20), "Move", menuCenter, 220, TextEntity.Alignment.CENTER);
+
+        upButton = new ImageButton(context.getImage("up"), menuCenter, 190);
+        downButton = new ImageButton(context.getImage("down"), menuCenter, 130);
+        leftButton = new ImageButton(context.getImage("left"), menuCenter - 30, 160);
+        rightButton = new ImageButton(context.getImage("right"), menuCenter + 30, 160);
+
+        endTurnButton = new TextButton(context);
+        endTurnButton.text.setText("End Turn");
+        endTurnButton.setPosition(menuCenter, 50);
+
+        waitingText = new TextEntity(context.getFont(Context.VCR20), "Waiting...", menuCenter, HEIGHT / 2f, TextEntity.Alignment.CENTER);
     }
 
-    private void updateMenuItems() {
-        float sumy = y;
-        for (MenuItem item : menuItems) {
-            item.setPosition(x, sumy);
-            sumy -= 25;
-        }
-    }
+    public void input() {
+        m.set(Gdx.input.getX(), Gdx.input.getY(), 0);
+        cam.unproject(m);
 
-    public void onMouseMove(float mx, float my) {
-        for (MenuItem item : menuItems) {
-            item.setHover(item.contains(mx, my));
-        }
-    }
-
-    public void onMouseClick(float mx, float my) {
-        for (MenuItem item : menuItems) {
-            if (item.contains(mx, my)) item.toggleSelected();
+        if (Gdx.input.justTouched()) {
+            if (upButton.contains(m.x, m.y)) player.move(snakes, 1, 0);
+            if (downButton.contains(m.x, m.y)) player.move(snakes, -1, 0);
+            if (leftButton.contains(m.x, m.y)) player.move(snakes, 0, -1);
+            if (rightButton.contains(m.x, m.y)) player.move(snakes, 0, 1);
+            if (endTurnButton.contains(m.x, m.y)) endTurn.callback();
         }
     }
 
     @Override
+    public void update(float dt) {
+        energyText.setText("Energy: " + player.energy);
+    }
+
+    @Override
     public void render(SpriteBatch sb) {
+        sb.setProjectionMatrix(cam.combined);
+
+        sb.setColor(DARK_GRAY);
+        sb.draw(pixel, NUM_COLS * TILE_SIZE, 0, WIDTH - NUM_COLS * TILE_SIZE, HEIGHT);
+
         sb.setColor(1, 1, 1, 1);
-        for (MenuItem item : menuItems) item.render(sb);
+        if (waiting) {
+            waitingText.render(sb);
+        } else {
+            energyText.render(sb);
+            moveText.render(sb);
+
+            upButton.render(sb);
+            downButton.render(sb);
+            leftButton.render(sb);
+            rightButton.render(sb);
+
+            endTurnButton.render(sb);
+        }
     }
 }

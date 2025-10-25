@@ -35,24 +35,7 @@ public class SnakeEntity extends GridEntity {
 
     @Override
     public void update(float dt) {
-        float destx = col * TILE_SIZE;
-        float desty = row * TILE_SIZE;
-        if (x < destx) {
-            x += dx * dt;
-            if (x > destx) x = destx;
-        }
-        if (x > destx) {
-            x -= dx * dt;
-            if (x < destx) x = destx;
-        }
-        if (y < desty) {
-            y += dy * dt;
-            if (y > desty) y = desty;
-        }
-        if (y > desty) {
-            y -= dy * dt;
-            if (y < desty) y = desty;
-        }
+        moveToDestination(dt);
     }
 
     @Override

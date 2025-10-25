@@ -8,33 +8,57 @@ import java.util.List;
 
 public class Snake extends GridEntity {
 
-    private final int maxEnergy = 5;
-    public int energy = 5;
-    private final List<SnakeEntity> bodies;
+    private final Context context;
 
-    public Snake(Context context) {
-        bodies = new ArrayList<>();
-        bodies.add(new SnakeHead(context, 10, 7, Direction.RIGHT));
-        bodies.add(new SnakeEntity(context, 10, 6));
-        bodies.add(new SnakeEntity(context, 10, 5));
-        bodies.add(new SnakeEntity(context, 10, 4));
-        bodies.add(new SnakeEntity(context, 10, 3));
-        bodies.add(new SnakeEntity(context, 10, 2));
-        bodies.add(new SnakeEntity(context, 10, 1));
-        bodies.add(new SnakeEntity(context, 10, 0));
-        bodies.add(new SnakeEntity(context, 11, 0));
-        bodies.add(new SnakeEntity(context, 12, 0));
-        bodies.add(new SnakeEntity(context, 13, 0));
+    private final int maxEnergy = 8;
+    public int energy = maxEnergy;
+    private final List<SnakeEntity> bodies = new ArrayList<>();
+
+    public boolean ready;
+    private Bomb bomb;
+    public boolean canBomb = true;
+
+    public Snake(Context context, List<SnakeEntity> bodies) {
+        this.context = context;
+        this.bodies.addAll(bodies);
         updateDirections();
+        ready = true;
+    }
+
+    public void next() {
 
     }
 
-    public void move(int dr, int dc) {
-        moveBodies();
+    public void move(List<Snake> snakes, int dr, int dc) {
+        if (energy <= 0) return;
         SnakeEntity head = bodies.get(0);
+        for (Snake snake : snakes) {
+            for (SnakeEntity body : snake.bodies) {
+                if (body.row == head.row + dr && body.col == head.col + dc) return;
+            }
+        }
+        moveBodies();
         Direction direction = getDirection(head.row, head.col, head.row + dr, head.col + dc);
         head.setDest(head.row + dr, head.col + dc, direction);
         updateDirections();
+        energy--;
+    }
+
+    public void bomb(List<Bomb> bombs) {
+        if (canBomb) {
+            canBomb = false;
+            bomb = new Bomb(context, Bomb.BombType.BOMB, bodies.get(0).row, bodies.get(0).col);
+            bombs.add(bomb);
+        }
+    }
+
+    public void bomb(List<Bomb> bombs, int row, int col) {
+        if (canBomb) {
+            canBomb = false;
+            bomb = new Bomb(context, Bomb.BombType.BOMB, bodies.get(0).row, bodies.get(0).col);
+            bomb.setDest(row, col);
+            bombs.add(bomb);
+        }
     }
 
     private void moveBodies() {
@@ -62,7 +86,20 @@ public class Snake extends GridEntity {
 
     @Override
     public void update(float dt) {
-        for (SnakeEntity body : bodies) body.update(dt);
+        boolean moving = false;
+        for (SnakeEntity body : bodies) {
+            body.update(dt);
+            if (!body.atDestination()) {
+                moving = true;
+            }
+        }
+
+        if (bomb != null) {
+            bomb.update(dt);
+//            if (bomb.atDestination()) bomb = null;
+        }
+
+        ready = !moving && bomb == null;
     }
 
     @Override
@@ -70,5 +107,6 @@ public class Snake extends GridEntity {
         for (int i = bodies.size() - 1; i >= 0; i--) {
             bodies.get(i).render(sb);
         }
+        if (bomb != null) bomb.render(sb);
     }
 }

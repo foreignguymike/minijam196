@@ -1,9 +1,6 @@
 package com.distraction.minijam196.entity;
 
-import static com.distraction.minijam196.Constants.DARK_BLUE;
 import static com.distraction.minijam196.Constants.HEIGHT;
-import static com.distraction.minijam196.Constants.MENU_STRIPE_1;
-import static com.distraction.minijam196.Constants.MENU_STRIPE_2;
 import static com.distraction.minijam196.Constants.NUM_COLS;
 import static com.distraction.minijam196.Constants.TILE_SIZE;
 import static com.distraction.minijam196.Constants.WIDTH;
@@ -29,9 +26,6 @@ public class Menu extends Entity {
     protected final Vector3 m;
 
     private final Snake player;
-    private final List<Snake> snakes;
-
-    private final TextureRegion pixel;
     private final TextureRegion bg;
 
     private final TextEntity energyText;
@@ -51,15 +45,13 @@ public class Menu extends Entity {
 
     public boolean waiting;
 
-    public Menu(Context context, Snake player, List<Snake> snakes, SimpleCallback endTurn) {
+    public Menu(Context context, Snake player, SimpleCallback endTurn) {
         this.player = player;
-        this.snakes = snakes;
         this.endTurn = endTurn;
 
         x = WIDTH / 2f;
         y = HEIGHT / 2f;
 
-        pixel = context.getPixel();
         bg = context.getImage("menubg");
 
         viewport = new MyViewport(Constants.WIDTH, Constants.HEIGHT);
@@ -67,7 +59,7 @@ public class Menu extends Entity {
         m = new Vector3();
 
         float menuCenter = WIDTH - (WIDTH - NUM_COLS * TILE_SIZE) / 2f;
-        energyText = new TextEntity(context.getFont(Context.VCR20), "Energy: " + player.energy, menuCenter, 320, TextEntity.Alignment.CENTER);
+        energyText = new TextEntity(context.getFont(Context.VCR20), "Energy" + player.energy, menuCenter, 320, TextEntity.Alignment.CENTER);
         moveText = new TextEntity(context.getFont(Context.VCR20), "Move", menuCenter, 264, TextEntity.Alignment.CENTER);
         keys = context.getImage("keys");
         bombText = new TextEntity(context.getFont(Context.VCR20), "Bomb", menuCenter, 160, TextEntity.Alignment.CENTER);
@@ -95,7 +87,7 @@ public class Menu extends Entity {
 
     @Override
     public void update(float dt) {
-        energyText.setText("Energy: " + player.energy);
+        energyText.setText("Energy " + player.energy);
     }
 
     @Override

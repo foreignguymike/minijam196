@@ -64,11 +64,8 @@ public class PlayScreen extends Screen {
         tile = context.getImage("tile");
         rangeImage = context.getImage("range");
 
-//        if (!context.loaded) {
-//            context.loaded = true;
-            ignoreInput = true;
-            in.start();
-//        }
+        ignoreInput = true;
+        in.start();
 
         particles = new ArrayList<>();
 
@@ -127,7 +124,8 @@ public class PlayScreen extends Screen {
         bodies.add(new SnakeEntity(body, 17, 13));
         bodies.add(new SnakeEntity(body, 17, 14));
         bodies.add(new SnakeEntity(body, 17, 15));
-        snakes.add(new Snake(context, snakes, bodies, bombs));
+        snake = new Snake(context, snakes, bodies, bombs);
+        snakes.add(snake);
         if (playerIndex == 1) {
             player = snake;
             player.showRange = true;
@@ -147,7 +145,8 @@ public class PlayScreen extends Screen {
         bodies.add(new SnakeEntity(body, 8, 22));
         bodies.add(new SnakeEntity(body, 9, 22));
         bodies.add(new SnakeEntity(body, 10, 22));
-        snakes.add(new Snake(context, snakes, bodies, bombs));
+        snake = new Snake(context, snakes, bodies, bombs);
+        snakes.add(snake);
         if (playerIndex == 2) {
             player = snake;
             player.showRange = true;
@@ -167,13 +166,14 @@ public class PlayScreen extends Screen {
         bodies.add(new SnakeEntity(body, 0, 13));
         bodies.add(new SnakeEntity(body, 0, 14));
         bodies.add(new SnakeEntity(body, 0, 15));
-        snakes.add(new Snake(context, snakes, bodies, bombs));
+        snake = new Snake(context, snakes, bodies, bombs);
+        snakes.add(snake);
         if (playerIndex == 3) {
             player = snake;
             player.showRange = true;
         }
 
-        menu = new Menu(context, player, snakes, this::nextTurn);
+        menu = new Menu(context, player, this::nextTurn);
 
         cursor = new ImageButton(context.getImage("cursor"));
 

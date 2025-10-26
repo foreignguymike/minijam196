@@ -32,16 +32,22 @@ public class Menu extends Entity {
     private final List<Snake> snakes;
 
     private final TextureRegion pixel;
+    private final TextureRegion bg;
 
     private final TextEntity energyText;
     private final TextEntity moveText;
     private final TextureRegion keys;
+    private final TextEntity bombText;
+    private final TextureRegion mouse;
 
     private final TextButton endTurnButton;
 
     private final SimpleCallback endTurn;
 
     private final TextEntity waitingText;
+
+    private final TextureRegion bombFill;
+    private final TextureRegion bombEmpty;
 
     public boolean waiting;
 
@@ -54,21 +60,27 @@ public class Menu extends Entity {
         y = HEIGHT / 2f;
 
         pixel = context.getPixel();
+        bg = context.getImage("menubg");
 
         viewport = new MyViewport(Constants.WIDTH, Constants.HEIGHT);
         cam = viewport.getCamera();
         m = new Vector3();
 
         float menuCenter = WIDTH - (WIDTH - NUM_COLS * TILE_SIZE) / 2f;
-        energyText = new TextEntity(context.getFont(Context.VCR20), "Energy: " + player.energy, menuCenter, 300, TextEntity.Alignment.CENTER);
-        moveText = new TextEntity(context.getFont(Context.VCR20), "Move", menuCenter, 220, TextEntity.Alignment.CENTER);
+        energyText = new TextEntity(context.getFont(Context.VCR20), "Energy: " + player.energy, menuCenter, 320, TextEntity.Alignment.CENTER);
+        moveText = new TextEntity(context.getFont(Context.VCR20), "Move", menuCenter, 264, TextEntity.Alignment.CENTER);
         keys = context.getImage("keys");
+        bombText = new TextEntity(context.getFont(Context.VCR20), "Bomb", menuCenter, 160, TextEntity.Alignment.CENTER);
+        mouse = context.getImage("mouse");
 
         endTurnButton = new TextButton(context);
         endTurnButton.text.setText("End Turn");
-        endTurnButton.setPosition(menuCenter, 50);
+        endTurnButton.setPosition(menuCenter, 29);
 
-        waitingText = new TextEntity(context.getFont(Context.VCR20), "Waiting...", menuCenter, HEIGHT / 2f, TextEntity.Alignment.CENTER);
+        waitingText = new TextEntity(context.getFont(Context.VCR20), "Waiting...", menuCenter, 320, TextEntity.Alignment.CENTER);
+
+        bombFill = context.getImage("bombfill");
+        bombEmpty = context.getImage("bombempty");
     }
 
     public void input() {
@@ -90,11 +102,7 @@ public class Menu extends Entity {
     public void render(SpriteBatch sb) {
         sb.setProjectionMatrix(cam.combined);
 
-        sb.setColor(MENU_STRIPE_1);
-        sb.draw(pixel, NUM_COLS * TILE_SIZE, 0, WIDTH - NUM_COLS * TILE_SIZE, HEIGHT);
-        sb.setColor(MENU_STRIPE_2);
-        sb.draw(pixel, NUM_COLS * TILE_SIZE + 32, 0, 32, HEIGHT);
-        sb.draw(pixel, NUM_COLS * TILE_SIZE + 96, 0, 32, HEIGHT);
+        sb.draw(bg, NUM_COLS * TILE_SIZE, 0);
 
         sb.setColor(1, 1, 1, 1);
         if (waiting) {
@@ -102,7 +110,14 @@ public class Menu extends Entity {
         } else {
             energyText.render(sb);
             moveText.render(sb);
-            Utils.drawCentered(sb, keys, moveText.x, moveText.y - 50);
+            Utils.drawCentered(sb, keys, moveText.x, moveText.y - 33);
+            bombText.render(sb);
+            Utils.drawCentered(sb, mouse, bombText.x, bombText.y - 38);
+            float bombWidth = player.maxBombs * 32;
+            for (int i = 0; i < player.maxBombs; i++) {
+                if (i < player.bombsRemaining) Utils.drawCentered(sb, bombFill, moveText.x - bombWidth / 2f + 16 + i * 32, 80);
+                else Utils.drawCentered(sb, bombEmpty, moveText.x - bombWidth / 2f + 16 + i * 32, 80);
+            }
 
             endTurnButton.render(sb);
         }

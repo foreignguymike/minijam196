@@ -23,6 +23,8 @@ import com.distraction.minijam196.entity.TextButton;
 import com.distraction.minijam196.entity.TextEntity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class PlayScreen extends Screen {
@@ -33,10 +35,12 @@ public class PlayScreen extends Screen {
         FINISH
     }
 
+    private final Snake.SnakeType snakeType;
+
     private final TextureRegion tile;
     private final TextureRegion rangeImage;
 
-    private final Snake player;
+    private Snake player;
     private final List<Snake> snakes;
     private final List<Bomb> bombs;
     private final Menu menu;
@@ -54,8 +58,9 @@ public class PlayScreen extends Screen {
     private final TextEntity finishText;
     private final TextButton restartButton;
 
-    public PlayScreen(Context context) {
+    public PlayScreen(Context context, Snake.SnakeType snakeType) {
         super(context);
+        this.snakeType = snakeType;
         tile = context.getImage("tile");
         rangeImage = context.getImage("range");
 
@@ -70,66 +75,103 @@ public class PlayScreen extends Screen {
         snakes = new ArrayList<>();
         bombs = new ArrayList<>();
 
-        TextureRegion greenHead = context.getImage("greensnake").split(20, 20)[0][0];
-        TextureRegion greenBody = context.getImage("greensnake").split(20, 20)[0][1];
+        Snake.SnakeType[] snakeTypeList = Snake.SnakeType.values();
+        List<Snake.SnakeType> snakeTypes = Arrays.asList(snakeTypeList);
+        Collections.shuffle(snakeTypes);
 
+        int playerIndex = MathUtils.random(0, snakeTypeList.length - 1);
+
+        if (snakeTypes.get(playerIndex) != snakeType) {
+            int index = 0;
+            for (int i = 0; i < snakeTypes.size(); i++) {
+                if (snakeTypes.get(i) == snakeType) {
+                    index = i;
+                    break;
+                }
+            }
+            Utils.swap(snakeTypes, index, playerIndex);
+        }
+
+        TextureRegion head = context.getImage(snakeTypes.get(0).name).split(20, 20)[0][0];
+        TextureRegion body = context.getImage(snakeTypes.get(0).name).split(20, 20)[0][1];
         List<SnakeEntity> bodies = new ArrayList<>();
-        bodies.add(new SnakeEntity(greenHead, 9, 6, Direction.RIGHT));
-        bodies.add(new SnakeEntity(greenBody, 9, 5));
-        bodies.add(new SnakeEntity(greenBody, 10, 5));
-        bodies.add(new SnakeEntity(greenBody, 10, 4));
-        bodies.add(new SnakeEntity(greenBody, 10, 3));
-        bodies.add(new SnakeEntity(greenBody, 9, 3));
-        bodies.add(new SnakeEntity(greenBody, 8, 3));
-        bodies.add(new SnakeEntity(greenBody, 8, 2));
-        bodies.add(new SnakeEntity(greenBody, 8, 1));
-        bodies.add(new SnakeEntity(greenBody, 9, 1));
-        bodies.add(new SnakeEntity(greenBody, 10, 1));
-        player = new Snake(context, snakes, bodies, bombs);
-        player.showRange = true;
-        snakes.add(player);
+        bodies.add(new SnakeEntity(head, 9, 6, Direction.RIGHT));
+        bodies.add(new SnakeEntity(body, 9, 5));
+        bodies.add(new SnakeEntity(body, 10, 5));
+        bodies.add(new SnakeEntity(body, 10, 4));
+        bodies.add(new SnakeEntity(body, 10, 3));
+        bodies.add(new SnakeEntity(body, 9, 3));
+        bodies.add(new SnakeEntity(body, 8, 3));
+        bodies.add(new SnakeEntity(body, 8, 2));
+        bodies.add(new SnakeEntity(body, 8, 1));
+        bodies.add(new SnakeEntity(body, 9, 1));
+        bodies.add(new SnakeEntity(body, 10, 1));
+        Snake snake = new Snake(context, snakes, bodies, bombs);
+        snakes.add(snake);
+        if (playerIndex == 0) {
+            player = snake;
+            player.showRange = true;
+        }
 
+        head = context.getImage(snakeTypes.get(1).name).split(20, 20)[0][0];
+        body = context.getImage(snakeTypes.get(1).name).split(20, 20)[0][1];
         bodies = new ArrayList<>();
-        bodies.add(new SnakeEntity(greenHead, 14, 12, Direction.DOWN));
-        bodies.add(new SnakeEntity(greenBody, 15, 12));
-        bodies.add(new SnakeEntity(greenBody, 15, 11));
-        bodies.add(new SnakeEntity(greenBody, 15, 10));
-        bodies.add(new SnakeEntity(greenBody, 16, 10));
-        bodies.add(new SnakeEntity(greenBody, 17, 10));
-        bodies.add(new SnakeEntity(greenBody, 17, 11));
-        bodies.add(new SnakeEntity(greenBody, 17, 12));
-        bodies.add(new SnakeEntity(greenBody, 17, 13));
-        bodies.add(new SnakeEntity(greenBody, 17, 14));
-        bodies.add(new SnakeEntity(greenBody, 17, 15));
+        bodies.add(new SnakeEntity(head, 14, 12, Direction.DOWN));
+        bodies.add(new SnakeEntity(body, 15, 12));
+        bodies.add(new SnakeEntity(body, 15, 11));
+        bodies.add(new SnakeEntity(body, 15, 10));
+        bodies.add(new SnakeEntity(body, 16, 10));
+        bodies.add(new SnakeEntity(body, 17, 10));
+        bodies.add(new SnakeEntity(body, 17, 11));
+        bodies.add(new SnakeEntity(body, 17, 12));
+        bodies.add(new SnakeEntity(body, 17, 13));
+        bodies.add(new SnakeEntity(body, 17, 14));
+        bodies.add(new SnakeEntity(body, 17, 15));
         snakes.add(new Snake(context, snakes, bodies, bombs));
+        if (playerIndex == 1) {
+            player = snake;
+            player.showRange = true;
+        }
 
+        head = context.getImage(snakeTypes.get(2).name).split(20, 20)[0][0];
+        body = context.getImage(snakeTypes.get(2).name).split(20, 20)[0][1];
         bodies = new ArrayList<>();
-        bodies.add(new SnakeEntity(greenHead, 9, 17, Direction.LEFT));
-        bodies.add(new SnakeEntity(greenBody, 9, 18));
-        bodies.add(new SnakeEntity(greenBody, 10, 18));
-        bodies.add(new SnakeEntity(greenBody, 10, 19));
-        bodies.add(new SnakeEntity(greenBody, 10, 20));
-        bodies.add(new SnakeEntity(greenBody, 9, 20));
-        bodies.add(new SnakeEntity(greenBody, 8, 20));
-        bodies.add(new SnakeEntity(greenBody, 8, 21));
-        bodies.add(new SnakeEntity(greenBody, 8, 22));
-        bodies.add(new SnakeEntity(greenBody, 9, 22));
-        bodies.add(new SnakeEntity(greenBody, 10, 22));
+        bodies.add(new SnakeEntity(head, 9, 17, Direction.LEFT));
+        bodies.add(new SnakeEntity(body, 9, 18));
+        bodies.add(new SnakeEntity(body, 10, 18));
+        bodies.add(new SnakeEntity(body, 10, 19));
+        bodies.add(new SnakeEntity(body, 10, 20));
+        bodies.add(new SnakeEntity(body, 9, 20));
+        bodies.add(new SnakeEntity(body, 8, 20));
+        bodies.add(new SnakeEntity(body, 8, 21));
+        bodies.add(new SnakeEntity(body, 8, 22));
+        bodies.add(new SnakeEntity(body, 9, 22));
+        bodies.add(new SnakeEntity(body, 10, 22));
         snakes.add(new Snake(context, snakes, bodies, bombs));
+        if (playerIndex == 2) {
+            player = snake;
+            player.showRange = true;
+        }
 
+        head = context.getImage(snakeTypes.get(3).name).split(20, 20)[0][0];
+        body = context.getImage(snakeTypes.get(3).name).split(20, 20)[0][1];
         bodies = new ArrayList<>();
-        bodies.add(new SnakeEntity(greenHead, 3, 12, Direction.UP));
-        bodies.add(new SnakeEntity(greenBody, 2, 12));
-        bodies.add(new SnakeEntity(greenBody, 2, 11));
-        bodies.add(new SnakeEntity(greenBody, 2, 10));
-        bodies.add(new SnakeEntity(greenBody, 1, 10));
-        bodies.add(new SnakeEntity(greenBody, 0, 10));
-        bodies.add(new SnakeEntity(greenBody, 0, 11));
-        bodies.add(new SnakeEntity(greenBody, 0, 12));
-        bodies.add(new SnakeEntity(greenBody, 0, 13));
-        bodies.add(new SnakeEntity(greenBody, 0, 14));
-        bodies.add(new SnakeEntity(greenBody, 0, 15));
+        bodies.add(new SnakeEntity(head, 3, 12, Direction.UP));
+        bodies.add(new SnakeEntity(body, 2, 12));
+        bodies.add(new SnakeEntity(body, 2, 11));
+        bodies.add(new SnakeEntity(body, 2, 10));
+        bodies.add(new SnakeEntity(body, 1, 10));
+        bodies.add(new SnakeEntity(body, 0, 10));
+        bodies.add(new SnakeEntity(body, 0, 11));
+        bodies.add(new SnakeEntity(body, 0, 12));
+        bodies.add(new SnakeEntity(body, 0, 13));
+        bodies.add(new SnakeEntity(body, 0, 14));
+        bodies.add(new SnakeEntity(body, 0, 15));
         snakes.add(new Snake(context, snakes, bodies, bombs));
+        if (playerIndex == 3) {
+            player = snake;
+            player.showRange = true;
+        }
 
         menu = new Menu(context, player, snakes, this::nextTurn);
 
@@ -143,6 +185,10 @@ public class PlayScreen extends Screen {
     }
 
     private void nextTurn() {
+        if (isGameOver()) {
+            turnPhase = TurnPhase.FINISH;
+            return;
+        }
         currentTurnIndex++;
         if (currentTurnIndex >= snakes.size()) currentTurnIndex = 0;
 
@@ -182,6 +228,11 @@ public class PlayScreen extends Screen {
         }
     }
 
+    private boolean isGameOver() {
+        int alive = getAliveCount();
+        return player.dead || alive <= 1;
+    }
+
     @Override
     public void input() {
         if (ignoreInput) return;
@@ -217,7 +268,7 @@ public class PlayScreen extends Screen {
             if (Gdx.input.justTouched()) {
                 if (restartButton.contains(m.x, m.y)) {
                     ignoreInput = true;
-                    out.setCallback(() -> context.sm.replace(new PlayScreen(context)));
+                    out.setCallback(() -> context.sm.replace(new PlayScreen(context, snakeType)));
                     out.start();
                 }
             }
@@ -231,15 +282,12 @@ public class PlayScreen extends Screen {
         in.update(dt);
         out.update(dt);
 
-        int alive = getAliveCount();
-        if (player.dead || alive <= 1) {
+        if (isGameOver()) {
             cam.position.set(WIDTH / 2f, HEIGHT / 2f, 0);
             cam.update();
             turnPhase = TurnPhase.FINISH;
-            if (player.dead && alive == 0) finishText.setText("Total destruction");
-            else if (player.dead) finishText.setText("You lose!");
+            if (player.dead) finishText.setText("You lose!");
             else finishText.setText("Victory!");
-
         }
 
         menu.update(dt);
@@ -276,7 +324,7 @@ public class PlayScreen extends Screen {
                 cam.position.set(WIDTH / 2f + MathUtils.random(-5, 5), HEIGHT / 2f + MathUtils.random(-5, 5), 0);
                 cam.update();
             }
-        } else {
+        } else if (turnPhase == TurnPhase.ACTION) {
             if (!isPlayerTurn()) {
                 Snake bot = snakes.get(currentTurnIndex);
                 if (bot.ready) {
@@ -296,10 +344,6 @@ public class PlayScreen extends Screen {
             p.update(dt);
             if (p.remove) particles.remove(i);
         }
-
-        if (player.atDestination()) {
-
-        }
     }
 
     @Override
@@ -316,7 +360,7 @@ public class PlayScreen extends Screen {
         }
         cursor.render(sb);
 
-        if (player.showRange) {
+        if (!player.dead && player.showRange) {
             sb.setColor(1, 1, 1, 0.1f);
             Utils.drawCentered(sb, rangeImage, player.getHeadCol() * TILE_SIZE + TILE_SIZE / 2f, player.getHeadRow() * TILE_SIZE + TILE_SIZE / 2f);
         }

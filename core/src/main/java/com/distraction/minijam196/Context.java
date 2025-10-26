@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.distraction.minijam196.entity.Snake;
 import com.distraction.minijam196.screens.PlayScreen;
 import com.distraction.minijam196.screens.ScreenManager;
 
@@ -30,7 +31,7 @@ public class Context {
 
         sb = new SpriteBatch();
 
-        sm = new ScreenManager(new PlayScreen(this));
+        sm = new ScreenManager(new PlayScreen(this, Snake.SnakeType.BLUE));
     }
 
     public TextureRegion getImage(String key) {

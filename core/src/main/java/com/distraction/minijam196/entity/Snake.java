@@ -12,6 +12,18 @@ import java.util.List;
 
 public class Snake extends GridEntity {
 
+    public enum SnakeType {
+        GREEN("greensnake"),
+        BLUE("bluesnake"),
+        ORANGE("orangesnake"),
+        RED("redsnake");
+
+        public final String name;
+        SnakeType(String name) {
+            this.name = name;
+        }
+    }
+
     private final Context context;
 
     private final int maxEnergy = 7;
@@ -93,12 +105,16 @@ public class Snake extends GridEntity {
                 }
             }
         } else {
-            Bomb cb = getClosestBomb();
-            if (cb != null) {
-                return moveAwayFrom(cb);
+            if (MathUtils.random() < 0.8f) {
+                Bomb cb = getClosestBomb();
+                if (cb != null) {
+                    return moveAwayFrom(cb);
+                } else {
+                    SnakeEntity se = getClosestSnakeEntity();
+                    return moveAwayFrom(se);
+                }
             } else {
-                SnakeEntity se = getClosestSnakeEntity();
-                return moveAwayFrom(se);
+                moveTowards(getClosestSnakeEntity());
             }
         }
         return true;

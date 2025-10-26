@@ -13,7 +13,6 @@ public class TextButton extends Entity {
     public final TextEntity text;
 
     private boolean hover;
-    private boolean selected;
 
     private TextureRegion image;
 
@@ -36,14 +35,8 @@ public class TextButton extends Entity {
         updateImage();
     }
 
-    public void toggleSelected() {
-        selected = !selected;
-        updateImage();
-    }
-
     private void updateImage() {
-        if (selected) image = context.getImage("menuitems");
-        else if (hover) image = context.getImage("menuitemh");
+        if (hover) image = context.getImage("menuitemh");
         else image = context.getImage("menuitem");
         w = image.getRegionWidth();
         h = image.getRegionHeight();

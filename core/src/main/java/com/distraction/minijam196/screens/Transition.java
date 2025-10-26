@@ -16,7 +16,6 @@ public class Transition {
         CHECKERED_OUT,
         FLASH_IN,
         FLASH_OUT,
-        NONE,
         PAN
     }
 

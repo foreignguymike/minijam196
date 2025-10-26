@@ -8,8 +8,10 @@ import static com.distraction.minijam196.Constants.WIDTH;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.distraction.minijam196.Constants;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.distraction.minijam196.Context;
+import com.distraction.minijam196.Utils;
 import com.distraction.minijam196.entity.Bomb;
 import com.distraction.minijam196.entity.Direction;
 import com.distraction.minijam196.entity.ImageButton;
@@ -17,7 +19,6 @@ import com.distraction.minijam196.entity.Menu;
 import com.distraction.minijam196.entity.Particle;
 import com.distraction.minijam196.entity.Snake;
 import com.distraction.minijam196.entity.SnakeEntity;
-import com.distraction.minijam196.entity.SnakeHead;
 import com.distraction.minijam196.entity.TextButton;
 import com.distraction.minijam196.entity.TextEntity;
 
@@ -31,6 +32,9 @@ public class PlayScreen extends Screen {
         ACTION,
         FINISH
     }
+
+    private final TextureRegion tile;
+    private final TextureRegion rangeImage;
 
     private final Snake player;
     private final List<Snake> snakes;
@@ -52,6 +56,8 @@ public class PlayScreen extends Screen {
 
     public PlayScreen(Context context) {
         super(context);
+        tile = context.getImage("tile");
+        rangeImage = context.getImage("range");
 
 //        if (!context.loaded) {
 //            context.loaded = true;
@@ -64,62 +70,66 @@ public class PlayScreen extends Screen {
         snakes = new ArrayList<>();
         bombs = new ArrayList<>();
 
+        TextureRegion greenHead = context.getImage("greensnake").split(20, 20)[0][0];
+        TextureRegion greenBody = context.getImage("greensnake").split(20, 20)[0][1];
+
         List<SnakeEntity> bodies = new ArrayList<>();
-        bodies.add(new SnakeHead(context, 9, 6, Direction.RIGHT));
-        bodies.add(new SnakeEntity(context, 9, 5));
-//        bodies.add(new SnakeEntity(context, 10, 5));
-//        bodies.add(new SnakeEntity(context, 10, 4));
-//        bodies.add(new SnakeEntity(context, 10, 3));
-//        bodies.add(new SnakeEntity(context, 9, 3));
-//        bodies.add(new SnakeEntity(context, 8, 3));
-//        bodies.add(new SnakeEntity(context, 8, 2));
-//        bodies.add(new SnakeEntity(context, 8, 1));
-//        bodies.add(new SnakeEntity(context, 9, 1));
-//        bodies.add(new SnakeEntity(context, 10, 1));
+        bodies.add(new SnakeEntity(greenHead, 9, 6, Direction.RIGHT));
+        bodies.add(new SnakeEntity(greenBody, 9, 5));
+        bodies.add(new SnakeEntity(greenBody, 10, 5));
+        bodies.add(new SnakeEntity(greenBody, 10, 4));
+        bodies.add(new SnakeEntity(greenBody, 10, 3));
+        bodies.add(new SnakeEntity(greenBody, 9, 3));
+        bodies.add(new SnakeEntity(greenBody, 8, 3));
+        bodies.add(new SnakeEntity(greenBody, 8, 2));
+        bodies.add(new SnakeEntity(greenBody, 8, 1));
+        bodies.add(new SnakeEntity(greenBody, 9, 1));
+        bodies.add(new SnakeEntity(greenBody, 10, 1));
         player = new Snake(context, snakes, bodies, bombs);
+        player.showRange = true;
         snakes.add(player);
 
-//        bodies = new ArrayList<>();
-//        bodies.add(new SnakeHead(context, 14, 12, Direction.DOWN));
-//        bodies.add(new SnakeEntity(context, 15, 12));
-//        bodies.add(new SnakeEntity(context, 15, 11));
-//        bodies.add(new SnakeEntity(context, 15, 10));
-//        bodies.add(new SnakeEntity(context, 16, 10));
-//        bodies.add(new SnakeEntity(context, 17, 10));
-//        bodies.add(new SnakeEntity(context, 17, 11));
-//        bodies.add(new SnakeEntity(context, 17, 12));
-//        bodies.add(new SnakeEntity(context, 17, 13));
-//        bodies.add(new SnakeEntity(context, 17, 14));
-//        bodies.add(new SnakeEntity(context, 17, 15));
-//        snakes.add(new Snake(context, snakes, bodies, bombs));
-
         bodies = new ArrayList<>();
-        bodies.add(new SnakeHead(context, 9, 17, Direction.LEFT));
-        bodies.add(new SnakeEntity(context, 9, 18));
-//        bodies.add(new SnakeEntity(context, 10, 18));
-//        bodies.add(new SnakeEntity(context, 10, 19));
-//        bodies.add(new SnakeEntity(context, 10, 20));
-//        bodies.add(new SnakeEntity(context, 9, 20));
-//        bodies.add(new SnakeEntity(context, 8, 20));
-//        bodies.add(new SnakeEntity(context, 8, 21));
-//        bodies.add(new SnakeEntity(context, 8, 22));
-//        bodies.add(new SnakeEntity(context, 9, 22));
-//        bodies.add(new SnakeEntity(context, 10, 22));
+        bodies.add(new SnakeEntity(greenHead, 14, 12, Direction.DOWN));
+        bodies.add(new SnakeEntity(greenBody, 15, 12));
+        bodies.add(new SnakeEntity(greenBody, 15, 11));
+        bodies.add(new SnakeEntity(greenBody, 15, 10));
+        bodies.add(new SnakeEntity(greenBody, 16, 10));
+        bodies.add(new SnakeEntity(greenBody, 17, 10));
+        bodies.add(new SnakeEntity(greenBody, 17, 11));
+        bodies.add(new SnakeEntity(greenBody, 17, 12));
+        bodies.add(new SnakeEntity(greenBody, 17, 13));
+        bodies.add(new SnakeEntity(greenBody, 17, 14));
+        bodies.add(new SnakeEntity(greenBody, 17, 15));
         snakes.add(new Snake(context, snakes, bodies, bombs));
 
-//        bodies = new ArrayList<>();
-//        bodies.add(new SnakeHead(context, 3, 12, Direction.UP));
-//        bodies.add(new SnakeEntity(context, 2, 12));
-//        bodies.add(new SnakeEntity(context, 2, 11));
-//        bodies.add(new SnakeEntity(context, 2, 10));
-//        bodies.add(new SnakeEntity(context, 1, 10));
-//        bodies.add(new SnakeEntity(context, 0, 10));
-//        bodies.add(new SnakeEntity(context, 0, 11));
-//        bodies.add(new SnakeEntity(context, 0, 12));
-//        bodies.add(new SnakeEntity(context, 0, 13));
-//        bodies.add(new SnakeEntity(context, 0, 14));
-//        bodies.add(new SnakeEntity(context, 0, 15));
-//        snakes.add(new Snake(context, snakes, bodies, bombs));
+        bodies = new ArrayList<>();
+        bodies.add(new SnakeEntity(greenHead, 9, 17, Direction.LEFT));
+        bodies.add(new SnakeEntity(greenBody, 9, 18));
+        bodies.add(new SnakeEntity(greenBody, 10, 18));
+        bodies.add(new SnakeEntity(greenBody, 10, 19));
+        bodies.add(new SnakeEntity(greenBody, 10, 20));
+        bodies.add(new SnakeEntity(greenBody, 9, 20));
+        bodies.add(new SnakeEntity(greenBody, 8, 20));
+        bodies.add(new SnakeEntity(greenBody, 8, 21));
+        bodies.add(new SnakeEntity(greenBody, 8, 22));
+        bodies.add(new SnakeEntity(greenBody, 9, 22));
+        bodies.add(new SnakeEntity(greenBody, 10, 22));
+        snakes.add(new Snake(context, snakes, bodies, bombs));
+
+        bodies = new ArrayList<>();
+        bodies.add(new SnakeEntity(greenHead, 3, 12, Direction.UP));
+        bodies.add(new SnakeEntity(greenBody, 2, 12));
+        bodies.add(new SnakeEntity(greenBody, 2, 11));
+        bodies.add(new SnakeEntity(greenBody, 2, 10));
+        bodies.add(new SnakeEntity(greenBody, 1, 10));
+        bodies.add(new SnakeEntity(greenBody, 0, 10));
+        bodies.add(new SnakeEntity(greenBody, 0, 11));
+        bodies.add(new SnakeEntity(greenBody, 0, 12));
+        bodies.add(new SnakeEntity(greenBody, 0, 13));
+        bodies.add(new SnakeEntity(greenBody, 0, 14));
+        bodies.add(new SnakeEntity(greenBody, 0, 15));
+        snakes.add(new Snake(context, snakes, bodies, bombs));
 
         menu = new Menu(context, player, snakes, this::nextTurn);
 
@@ -135,10 +145,13 @@ public class PlayScreen extends Screen {
     private void nextTurn() {
         currentTurnIndex++;
         if (currentTurnIndex >= snakes.size()) currentTurnIndex = 0;
-        snakes.get(currentTurnIndex).startTurn();
 
-        turnPhase = TurnPhase.BOMBS;
-        for (Bomb bomb : bombs) bomb.countdown();
+        Snake snake = snakes.get(currentTurnIndex);
+        if (!snake.dead) {
+            snakes.get(currentTurnIndex).startTurn();
+            turnPhase = TurnPhase.BOMBS;
+            for (Bomb bomb : bombs) bomb.countdown();
+        }
     }
 
     private boolean isPlayerTurn() {
@@ -208,6 +221,7 @@ public class PlayScreen extends Screen {
                     out.start();
                 }
             }
+            restartButton.setHover(restartButton.contains(m.x, m.y));
         }
 
     }
@@ -219,6 +233,8 @@ public class PlayScreen extends Screen {
 
         int alive = getAliveCount();
         if (player.dead || alive <= 1) {
+            cam.position.set(WIDTH / 2f, HEIGHT / 2f, 0);
+            cam.update();
             turnPhase = TurnPhase.FINISH;
             if (player.dead && alive == 0) finishText.setText("Total destruction");
             else if (player.dead) finishText.setText("You lose!");
@@ -254,6 +270,11 @@ public class PlayScreen extends Screen {
             time -= dt;
             if (time < 0) {
                 turnPhase = TurnPhase.ACTION;
+                cam.position.set(WIDTH / 2f, HEIGHT / 2f, 0);
+                cam.update();
+            } else {
+                cam.position.set(WIDTH / 2f + MathUtils.random(-5, 5), HEIGHT / 2f + MathUtils.random(-5, 5), 0);
+                cam.update();
             }
         } else {
             if (!isPlayerTurn()) {
@@ -275,6 +296,10 @@ public class PlayScreen extends Screen {
             p.update(dt);
             if (p.remove) particles.remove(i);
         }
+
+        if (player.atDestination()) {
+
+        }
     }
 
     @Override
@@ -283,18 +308,19 @@ public class PlayScreen extends Screen {
 
         sb.setProjectionMatrix(cam.combined);
 
-        sb.setColor(Constants.VERY_DARK_GREEN);
-        sb.draw(pixel, 0, 0, WIDTH, HEIGHT);
-        sb.setColor(Constants.DARK_GREEN);
+        sb.setColor(1, 1, 1, 1);
         for (int row = 0; row < NUM_ROWS; row++) {
             for (int col = 0; col < NUM_COLS; col++) {
-                if ((row + col) % 2 == 0) {
-                    sb.draw(pixel, col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-                }
+                sb.draw(tile, col * TILE_SIZE, row * TILE_SIZE);
             }
         }
         cursor.render(sb);
 
+        if (player.showRange) {
+            sb.setColor(1, 1, 1, 0.1f);
+            Utils.drawCentered(sb, rangeImage, player.getHeadCol() * TILE_SIZE + TILE_SIZE / 2f, player.getHeadRow() * TILE_SIZE + TILE_SIZE / 2f);
+        }
+        sb.setColor(1, 1, 1, 1);
         for (Snake s : snakes) s.render(sb);
         for (Bomb b : bombs) b.render(sb);
         for (Particle p : particles) p.render(sb);
@@ -310,6 +336,7 @@ public class PlayScreen extends Screen {
             restartButton.render(sb);
         }
 
+        sb.setColor(1, 1, 1, 1);
         in.render(sb);
         out.render(sb);
 

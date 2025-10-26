@@ -1,7 +1,9 @@
 package com.distraction.minijam196.entity;
 
-import static com.distraction.minijam196.Constants.DARK_GRAY;
+import static com.distraction.minijam196.Constants.DARK_BLUE;
 import static com.distraction.minijam196.Constants.HEIGHT;
+import static com.distraction.minijam196.Constants.MENU_STRIPE_1;
+import static com.distraction.minijam196.Constants.MENU_STRIPE_2;
 import static com.distraction.minijam196.Constants.NUM_COLS;
 import static com.distraction.minijam196.Constants.TILE_SIZE;
 import static com.distraction.minijam196.Constants.WIDTH;
@@ -16,8 +18,8 @@ import com.distraction.minijam196.Constants;
 import com.distraction.minijam196.Context;
 import com.distraction.minijam196.MyViewport;
 import com.distraction.minijam196.SimpleCallback;
+import com.distraction.minijam196.Utils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Menu extends Entity {
@@ -33,11 +35,7 @@ public class Menu extends Entity {
 
     private final TextEntity energyText;
     private final TextEntity moveText;
-
-    private final ImageButton upButton;
-    private final ImageButton downButton;
-    private final ImageButton leftButton;
-    private final ImageButton rightButton;
+    private final TextureRegion keys;
 
     private final TextButton endTurnButton;
 
@@ -64,11 +62,7 @@ public class Menu extends Entity {
         float menuCenter = WIDTH - (WIDTH - NUM_COLS * TILE_SIZE) / 2f;
         energyText = new TextEntity(context.getFont(Context.VCR20), "Energy: " + player.energy, menuCenter, 300, TextEntity.Alignment.CENTER);
         moveText = new TextEntity(context.getFont(Context.VCR20), "Move", menuCenter, 220, TextEntity.Alignment.CENTER);
-
-        upButton = new ImageButton(context.getImage("up"), menuCenter, 190);
-        downButton = new ImageButton(context.getImage("down"), menuCenter, 130);
-        leftButton = new ImageButton(context.getImage("left"), menuCenter - 30, 160);
-        rightButton = new ImageButton(context.getImage("right"), menuCenter + 30, 160);
+        keys = context.getImage("keys");
 
         endTurnButton = new TextButton(context);
         endTurnButton.text.setText("End Turn");
@@ -81,11 +75,8 @@ public class Menu extends Entity {
         m.set(Gdx.input.getX(), Gdx.input.getY(), 0);
         cam.unproject(m);
 
+        endTurnButton.setHover(endTurnButton.contains(m.x, m.y) && !waiting);
         if (Gdx.input.justTouched()) {
-            if (upButton.contains(m.x, m.y)) player.move(1, 0);
-            if (downButton.contains(m.x, m.y)) player.move(-1, 0);
-            if (leftButton.contains(m.x, m.y)) player.move(0, -1);
-            if (rightButton.contains(m.x, m.y)) player.move(0, 1);
             if (endTurnButton.contains(m.x, m.y)) endTurn.callback();
         }
     }
@@ -99,8 +90,11 @@ public class Menu extends Entity {
     public void render(SpriteBatch sb) {
         sb.setProjectionMatrix(cam.combined);
 
-        sb.setColor(DARK_GRAY);
+        sb.setColor(MENU_STRIPE_1);
         sb.draw(pixel, NUM_COLS * TILE_SIZE, 0, WIDTH - NUM_COLS * TILE_SIZE, HEIGHT);
+        sb.setColor(MENU_STRIPE_2);
+        sb.draw(pixel, NUM_COLS * TILE_SIZE + 32, 0, 32, HEIGHT);
+        sb.draw(pixel, NUM_COLS * TILE_SIZE + 96, 0, 32, HEIGHT);
 
         sb.setColor(1, 1, 1, 1);
         if (waiting) {
@@ -108,11 +102,7 @@ public class Menu extends Entity {
         } else {
             energyText.render(sb);
             moveText.render(sb);
-
-            upButton.render(sb);
-            downButton.render(sb);
-            leftButton.render(sb);
-            rightButton.render(sb);
+            Utils.drawCentered(sb, keys, moveText.x, moveText.y - 50);
 
             endTurnButton.render(sb);
         }

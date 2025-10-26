@@ -29,6 +29,8 @@ public class Snake extends GridEntity {
     private float damageTime;
     public boolean dead;
 
+    public boolean showRange;
+
     public Snake(Context context, List<Snake> snakes, List<SnakeEntity> bodies, List<Bomb> bombs) {
         this.context = context;
         this.snakes = snakes;
@@ -41,6 +43,18 @@ public class Snake extends GridEntity {
     public void startTurn() {
         energy = maxEnergy;
         bombsRemaining = maxBombs;
+    }
+
+    @Override
+    public boolean atDestination() {
+        boolean dest = true;
+        for (SnakeEntity se : bodies) {
+            if (!se.atDestination()) {
+                dest = false;
+                break;
+            }
+        }
+        return dest;
     }
 
     /**
@@ -194,7 +208,7 @@ public class Snake extends GridEntity {
 
             if (isValid(tr, tc)) {
                 bombsRemaining--;
-                bomb = new Bomb(context, Bomb.BombType.BOMB, snakes.size(), head.row, head.col);
+                bomb = new Bomb(context, Bomb.BombType.BOMB, getAliveCount(), head.row, head.col);
                 bomb.setDest(tr, tc);
                 return true;
             }
@@ -211,7 +225,7 @@ public class Snake extends GridEntity {
                         if (dist > range) continue;
                         if (isValid(r, c)) {
                             bombsRemaining--;
-                            bomb = new Bomb(context, Bomb.BombType.BOMB, snakes.size(), head.row, head.col);
+                            bomb = new Bomb(context, Bomb.BombType.BOMB, getAliveCount(), head.row, head.col);
                             bomb.setDest(r, c);
                             return true;
                         }
@@ -229,10 +243,26 @@ public class Snake extends GridEntity {
             if (dist > range) return;
             if (isValid(tr, tc)) {
                 bombsRemaining--;
-                bomb = new Bomb(context, Bomb.BombType.BOMB, snakes.size(), head.row, head.col);
+                bomb = new Bomb(context, Bomb.BombType.BOMB, getAliveCount(), head.row, head.col);
                 bomb.setDest(tr, tc);
             }
         }
+    }
+
+    public float getHeadRow() {
+        return bodies.get(0).row;
+    }
+
+    public float getHeadCol() {
+        return bodies.get(0).col;
+    }
+
+    private int getAliveCount() {
+        int count = 0;
+        for (Snake s : snakes) {
+            if (!s.dead) count++;
+        }
+        return count;
     }
 
     private boolean isValid(int row, int col) {

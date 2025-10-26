@@ -59,7 +59,13 @@ public class Constants {
     public static final Color GRAY = COLORS[22];
     public static final Color DARK_GRAY = COLORS[23];
     public static final Color VERY_DARK_GRAY = COLORS[24];
-    public static final Color BLACK = COLORS[25];
     public static final Color WHITE = COLORS[19];
+
+    public static final Color DARK_BLUE = COLORS[16];
+
+    public static final Color MENU_STRIPE_1 = COLORS[24];
+    public static final Color MENU_STRIPE_2 = COLORS[23];
+
+    public static final Color BLACK = new Color(0, 0, 0, 1);
 
 }

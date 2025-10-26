@@ -9,13 +9,15 @@ import java.util.List;
 public class Utils {
 
     public static void drawCentered(SpriteBatch sb, TextureRegion image, float x, float y) {
-        sb.draw(
-            image,
-            x - image.getRegionWidth() / 2f,
-            y - image.getRegionHeight() / 2f,
-            image.getRegionWidth(),
-            image.getRegionHeight()
-        );
+        float w = image.getRegionWidth();
+        float h = image.getRegionHeight();
+        sb.draw(image, x - w / 2f, y - h / 2f, w, h);
+    }
+
+    public static void drawCenteredScaled(SpriteBatch sb,TextureRegion image, float x, float y, float scale) {
+        float w = image.getRegionWidth() * scale;
+        float h = image.getRegionHeight() * scale;
+        sb.draw(image, x - w / 2f, y - h / 2f, w, h);
     }
 
     public static void drawRotated(SpriteBatch sb,  TextureRegion image, float x, float y, float rad) {

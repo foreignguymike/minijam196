@@ -5,6 +5,7 @@ import static com.distraction.minijam196.Constants.SELECT_BG;
 import static com.distraction.minijam196.Constants.WIDTH;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.distraction.minijam196.Context;
 import com.distraction.minijam196.entity.Snake;
@@ -31,7 +32,7 @@ public class SelectScreen extends Screen {
 
         snakeSelects = new ArrayList<>();
         Snake.SnakeType[] snakeTypes = Snake.SnakeType.values();
-        float w = 100;
+        float w = 110;
         float tw = w * snakeTypes.length;
         for (int i = 0; i < snakeTypes.length; i++) {
             Snake.SnakeType type = snakeTypes[i];
@@ -58,12 +59,21 @@ public class SelectScreen extends Screen {
                 out.start();
             }
         }
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            ignoreInput = true;
+            out.setTransition(Transition.Type.FLASH_OUT);
+            out.setCallback(() -> context.sm.replace(new TitleScreen(context)));
+            out.start();
+        }
     }
 
     @Override
     public void update(float dt) {
         in.update(dt);
         out.update(dt);
+
+        for (SnakeSelect select : snakeSelects) select.update(dt);
 
         offset += 10 * dt;
         if (offset > 40) {
@@ -92,9 +102,7 @@ public class SelectScreen extends Screen {
         sb.setColor(1, 1, 1, 1);
         titleText.render(sb);
 
-        for (SnakeSelect select : snakeSelects) {
-            select.render(sb);
-        }
+        for (SnakeSelect select : snakeSelects) select.render(sb);
 
         in.render(sb);
         out.render(sb);

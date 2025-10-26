@@ -3,6 +3,7 @@ package com.distraction.minijam196;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.utils.ScreenUtils;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
@@ -26,6 +27,7 @@ public class Main extends ApplicationAdapter {
 
     @Override
     public void render() {
+        ScreenUtils.clear(0, 0, 0, 1, true);
         context.sm.input();
         context.sm.update(Gdx.graphics.getDeltaTime());
         context.sm.render();

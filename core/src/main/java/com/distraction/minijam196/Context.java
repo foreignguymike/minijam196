@@ -18,8 +18,6 @@ public class Context {
     public ScreenManager sm;
     public SpriteBatch sb;
 
-    public boolean loaded;
-
     public Context() {
         assets = new AssetManager();
         assets.load(ATLAS, TextureAtlas.class);

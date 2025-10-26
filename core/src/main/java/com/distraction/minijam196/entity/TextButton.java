@@ -16,10 +16,11 @@ public class TextButton extends Entity {
 
     private TextureRegion image;
 
-    public TextButton(Context context) {
+    public TextButton(Context context, String s, float x, float y) {
         this.context = context;
-        text = new TextEntity(context.getFont(Context.VCR20), "", x, y, TextEntity.Alignment.CENTER);
+        text = new TextEntity(context.getFont(Context.VCR20), s, x, y, TextEntity.Alignment.CENTER);
         text.setColor(Constants.WHITE);
+        setPosition(x, y);
         updateImage();
     }
 

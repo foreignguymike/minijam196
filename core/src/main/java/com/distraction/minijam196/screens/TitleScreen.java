@@ -22,16 +22,11 @@ public class TitleScreen extends Screen {
         super(context);
         pixel = context.getPixel();
         title = context.getImage("title");
-        playButton = new TextButton(context);
-        playButton.text.setText("Play");
-        playButton.setPosition(WIDTH / 2f, 50);
+        playButton = new TextButton(context, "Play", WIDTH / 2f, 50);
 
-        if (!context.loaded) {
-            context.loaded = true;
-            ignoreInput = true;
-            in = new Transition(context, Transition.Type.FLASH_IN, 0.5f, () -> ignoreInput = false);
-            in.start();
-        }
+        ignoreInput = true;
+        in = new Transition(context, Transition.Type.FLASH_IN, 0.5f, () -> ignoreInput = false);
+        in.start();
     }
 
     @Override
@@ -42,6 +37,7 @@ public class TitleScreen extends Screen {
         unproject();
         playButton.setHover(playButton.contains(m.x, m.y));
         if (Gdx.input.justTouched() && playButton.contains(m.x, m.y)) {
+            ignoreInput = true;
             out.setCallback(() -> context.sm.replace(new SelectScreen(context)));
             out.start();
         }

@@ -65,9 +65,7 @@ public class Menu extends Entity {
         bombText = new TextEntity(context.getFont(Context.VCR20), "Bomb", menuCenter, 160, TextEntity.Alignment.CENTER);
         mouse = context.getImage("mouse");
 
-        endTurnButton = new TextButton(context);
-        endTurnButton.text.setText("End Turn");
-        endTurnButton.setPosition(menuCenter, 29);
+        endTurnButton = new TextButton(context, "End Turn", menuCenter, 29);
 
         waitingText = new TextEntity(context.getFont(Context.VCR20), "Waiting...", menuCenter, 320, TextEntity.Alignment.CENTER);
 

@@ -53,6 +53,7 @@ public class SelectScreen extends Screen {
         for (SnakeSelect select : snakeSelects) {
             select.setHover(select.contains(m.x, m.y));
             if (Gdx.input.justTouched() && select.contains(m.x, m.y)) {
+                ignoreInput = true;
                 out.setCallback(() -> context.sm.replace(new PlayScreen(context, select.type)));
                 out.start();
             }

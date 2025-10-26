@@ -1,5 +1,6 @@
 package com.distraction.minijam196.screens;
 
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -19,11 +20,11 @@ public class Transition {
         PAN
     }
 
-    private final Type type;
+    private Type type;
     private final float duration;
     private SimpleCallback callback;
 
-    private final OrthographicCamera cam;
+    private final Camera cam;
     private final Vector2 camStart;
     private final Vector2 camEnd;
 
@@ -41,7 +42,7 @@ public class Transition {
         this(context, type, null, null, null, duration, callback);
     }
 
-    public Transition(Context context, Type type, OrthographicCamera cam, Vector2 camStart, Vector2 camEnd, float duration, SimpleCallback callback) {
+    public Transition(Context context, Type type, Camera cam, Vector2 camStart, Vector2 camEnd, float duration, SimpleCallback callback) {
         this.type = type;
         this.cam = cam;
         this.camStart = camStart;
@@ -50,6 +51,10 @@ public class Transition {
         this.callback = callback;
 
         pixel = context.getPixel();
+    }
+
+    public void setTransition(Type type) {
+        this.type = type;
     }
 
     public void setCallback(SimpleCallback callback) {

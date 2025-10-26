@@ -1,12 +1,13 @@
 package com.distraction.minijam196.screens;
 
+import static com.distraction.minijam196.Constants.HEIGHT;
+import static com.distraction.minijam196.Constants.WIDTH;
+
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.distraction.minijam196.Constants;
 import com.distraction.minijam196.Context;
 import com.distraction.minijam196.MyViewport;
 
@@ -18,9 +19,11 @@ public abstract class Screen {
 
     public boolean transparent = false;
 
+    protected final Vector3 m;
     protected Viewport viewport;
     protected Camera cam;
-    protected final Vector3 m;
+    protected Viewport uiViewport;
+    protected Camera uiCam;
 
     protected SpriteBatch sb;
 
@@ -35,8 +38,10 @@ public abstract class Screen {
 
         pixel = context.getPixel();
 
-        viewport = new MyViewport(Constants.WIDTH, Constants.HEIGHT);
+        viewport = new MyViewport(WIDTH, HEIGHT);
         cam = viewport.getCamera();
+        uiViewport = new MyViewport(WIDTH, HEIGHT);
+        uiCam = uiViewport.getCamera();
 
         m = new Vector3();
 

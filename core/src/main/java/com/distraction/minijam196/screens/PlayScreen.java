@@ -176,12 +176,11 @@ public class PlayScreen extends Screen {
         menu = new Menu(context, player, this::nextTurn);
 
         cursor = new ImageButton(context.getImage("cursor"));
+        cursor.x = cursor.y = -100;
 
         float fieldCenter = NUM_COLS * TILE_SIZE / 2f;
         finishText = new TextEntity(context.getFont(Context.VCR20), "", fieldCenter, HEIGHT / 2f + 30, TextEntity.Alignment.CENTER);
-        restartButton = new TextButton(context);
-        restartButton.text.setText("Restart");
-        restartButton.setPosition(fieldCenter, HEIGHT / 2f - 30);
+        restartButton = new TextButton(context, "Restart", fieldCenter, HEIGHT / 2f - 30);
     }
 
     private void nextTurn() {
@@ -237,7 +236,13 @@ public class PlayScreen extends Screen {
     public void input() {
         if (ignoreInput) return;
 
-        if (!isPlayerTurn()) return;
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            ignoreInput = true;
+            context.sm.push(new PauseScreen(context, snakeType));
+            return;
+        }
+
+        if (!isGameOver() && !isPlayerTurn()) return;
 
         if (turnPhase == TurnPhase.ACTION) {
             menu.input();

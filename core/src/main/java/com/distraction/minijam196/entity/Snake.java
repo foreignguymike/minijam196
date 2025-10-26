@@ -14,7 +14,7 @@ public class Snake extends GridEntity {
 
     private final Context context;
 
-    private final int maxEnergy = 6;
+    private final int maxEnergy = 7;
     public int energy = maxEnergy;
     private final List<Snake> snakes;
     private final List<SnakeEntity> bodies = new ArrayList<>();
@@ -22,9 +22,12 @@ public class Snake extends GridEntity {
 
     public boolean ready; // bot only
     private Bomb bomb;
-    public int maxBombs = 1;
+    public int maxBombs = 2;
     public int bombsRemaining = maxBombs;
-    private final float range = 5;
+    private final float range = 6;
+
+    private float damageTime;
+    public boolean dead;
 
     public Snake(Context context, List<Snake> snakes, List<SnakeEntity> bodies, List<Bomb> bombs) {
         this.context = context;
@@ -44,24 +47,34 @@ public class Snake extends GridEntity {
      * @return false if end turn
      */
     public boolean next() {
+        if (dead) return false;
         if (bombsRemaining == 0 && energy == 0) return false;
 
         SnakeEntity head = bodies.get(0);
 
         if (bombsRemaining > 0) {
             SnakeEntity se = getClosestSnakeEntity();
+            if (se == null) return false;
             int dr = se.row - head.row;
             int dc = se.col - head.col;
             if (Math.abs(dr) + Math.abs(dc) <= range) {
                 if (!tryBomb(se.row, se.col)) {
                     Bomb cb = getClosestBomb();
-                    return moveAwayFrom(cb) || moveAwayFrom(se);
+                    if (MathUtils.randomBoolean()) {
+                        return moveAwayFrom(cb) || moveAwayFrom(se);
+                    } else {
+                        return moveTowards(se);
+                    }
                 }
             } else {
                 if (!moveTowards(se)) {
                     if (!tryBomb(se.row, se.col)) {
                         Bomb cb = getClosestBomb();
-                        return moveAwayFrom(cb) || moveAwayFrom(se);
+                        if (MathUtils.randomBoolean()) {
+                            return moveAwayFrom(cb) || moveAwayFrom(se);
+                        } else {
+                            return moveTowards(se);
+                        }
                     }
                 }
             }
@@ -90,8 +103,12 @@ public class Snake extends GridEntity {
             if (dc > 0 && move(0, 1)) return true;
             if (dc < 0 && move(0, -1)) return true;
             if (dr > 0 && move(1, 0)) return true;
-            return dr < 0 && move(-1, 0);
+            if (dr < 0 && move(-1, 0)) return true;
         }
+        if (move(1, 0)) return true;
+        if (move(-1, 0)) return true;
+        if (move(0, 1)) return true;
+        return move(0, -1);
     }
 
     public boolean moveAwayFrom(GridEntity other) {
@@ -107,8 +124,12 @@ public class Snake extends GridEntity {
             if (dc >= 0 && move(0, -1)) return true;
             if (dc < 0 && move(0, 1)) return true;
             if (dr >= 0 && move(-1, 0)) return true;
-            return dr < 0 && move(1, 0);
+            if (dr < 0 && move(1, 0)) return true;
         }
+        if (move(1, 0)) return true;
+        if (move(-1, 0)) return true;
+        if (move(0, 1)) return true;
+        return move(0, -1);
     }
 
     private Bomb getClosestBomb() {
@@ -173,7 +194,7 @@ public class Snake extends GridEntity {
 
             if (isValid(tr, tc)) {
                 bombsRemaining--;
-                bomb = new Bomb(context, Bomb.BombType.BOMB, head.row, head.col);
+                bomb = new Bomb(context, Bomb.BombType.BOMB, snakes.size(), head.row, head.col);
                 bomb.setDest(tr, tc);
                 return true;
             }
@@ -190,7 +211,7 @@ public class Snake extends GridEntity {
                         if (dist > range) continue;
                         if (isValid(r, c)) {
                             bombsRemaining--;
-                            bomb = new Bomb(context, Bomb.BombType.BOMB, head.row, head.col);
+                            bomb = new Bomb(context, Bomb.BombType.BOMB, snakes.size(), head.row, head.col);
                             bomb.setDest(r, c);
                             return true;
                         }
@@ -208,7 +229,7 @@ public class Snake extends GridEntity {
             if (dist > range) return;
             if (isValid(tr, tc)) {
                 bombsRemaining--;
-                bomb = new Bomb(context, Bomb.BombType.BOMB, head.row, head.col);
+                bomb = new Bomb(context, Bomb.BombType.BOMB, snakes.size(), head.row, head.col);
                 bomb.setDest(tr, tc);
             }
         }
@@ -256,8 +277,28 @@ public class Snake extends GridEntity {
         return Direction.LEFT;
     }
 
+    public void checkHit(List<Bomb> explodingBombs) {
+        for (Bomb b : explodingBombs) {
+            for (SnakeEntity se : bodies) {
+                int dr = b.row - se.row;
+                int dc = b.col - se.col;
+                if (Math.abs(dr) + Math.abs(dc) <= b.type.range) {
+                    damageTime = 1f;
+                    bodies.remove(bodies.size() - 1);
+                    if (bodies.size() <= 1) {
+                        dead = true;
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
     @Override
     public void update(float dt) {
+        if (dead) return;
+        damageTime -= dt;
+
         boolean moving = false;
         for (SnakeEntity body : bodies) {
             body.update(dt);
@@ -279,9 +320,13 @@ public class Snake extends GridEntity {
 
     @Override
     public void render(SpriteBatch sb) {
-        for (int i = bodies.size() - 1; i >= 0; i--) {
-            bodies.get(i).render(sb);
+        if (dead) return;
+        if (damageTime <= 0 || damageTime % 0.2f < 0.1f) {
+            for (int i = bodies.size() - 1; i >= 0; i--) {
+                bodies.get(i).render(sb);
+            }
         }
+
         if (bomb != null) bomb.render(sb);
     }
 }

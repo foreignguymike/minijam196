@@ -2,6 +2,7 @@ package com.distraction.minijam196;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends ApplicationAdapter {
@@ -16,6 +17,11 @@ public class Main extends ApplicationAdapter {
     @Override
     public void resize(int width, int height) {
         context.sm.resize(width, height);
+
+        Gdx.input.setCatchKey(Input.Keys.UP, true);
+        Gdx.input.setCatchKey(Input.Keys.DOWN, true);
+        Gdx.input.setCatchKey(Input.Keys.LEFT, true);
+        Gdx.input.setCatchKey(Input.Keys.RIGHT, true);
     }
 
     @Override

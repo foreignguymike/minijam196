@@ -10,16 +10,14 @@ import com.distraction.minijam196.Context;
 public class Bomb extends GridEntity {
 
     public enum BombType {
-        BOMB("bomb", 5),
-        CROSS("crossbomb", 5),
-        DCROSS("dcrossbomb", 5);
+        BOMB("bomb", 3);
 
         public String name;
-        public int delay;
+        public int range;
 
-        BombType(String name, int delay) {
+        BombType(String name, int range) {
             this.name = name;
-            this.delay = delay;
+            this.range = range;
         }
 
     }
@@ -34,9 +32,9 @@ public class Bomb extends GridEntity {
 
     private final TextEntity countdownText;
 
-    public Bomb(Context context, BombType type, int startRow, int startCol) {
+    public Bomb(Context context, BombType type, int delay, int startRow, int startCol) {
         this.type = type;
-        this.countdown = type.delay;
+        this.countdown = delay;
         x = startCol * TILE_SIZE;
         y = startRow * TILE_SIZE;
 

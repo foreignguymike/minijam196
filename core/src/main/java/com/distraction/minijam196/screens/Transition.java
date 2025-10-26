@@ -16,6 +16,7 @@ public class Transition {
         CHECKERED_OUT,
         FLASH_IN,
         FLASH_OUT,
+        NONE,
         PAN
     }
 
@@ -73,6 +74,10 @@ public class Transition {
         start = false;
         time = 0;
         done = false;
+    }
+
+    public float percent() {
+        return time / duration;
     }
 
     private int snap(float f) {

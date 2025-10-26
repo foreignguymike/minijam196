@@ -58,6 +58,8 @@ public class Constants {
     public static final Color TITLE_BG = COLORS[16];
     public static final Color TITLE_STRIPE = COLORS[17];
 
+    public static final Color SELECT_BG = COLORS[23];
+
     public static final Color BLACK = new Color(0, 0, 0, 1);
 
 }

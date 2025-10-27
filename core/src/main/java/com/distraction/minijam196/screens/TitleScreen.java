@@ -7,9 +7,11 @@ import static com.distraction.minijam196.Constants.WIDTH;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.distraction.minijam196.Context;
 import com.distraction.minijam196.Utils;
 import com.distraction.minijam196.entity.TextButton;
+import com.distraction.minijam196.entity.TextEntity;
 
 public class TitleScreen extends Screen {
 
@@ -18,15 +20,23 @@ public class TitleScreen extends Screen {
 
     private final TextButton playButton;
 
+    private final TextEntity jamText;
+
+    private float time;
+    private float scale = 1;
+
     public TitleScreen(Context context) {
         super(context);
         pixel = context.getPixel();
         title = context.getImage("title");
         playButton = new TextButton(context, "Play", WIDTH / 2f, 50);
 
+        jamText = new TextEntity(context.getFont(Context.M5X716), "Mini Jam 196", WIDTH - 10, 10, TextEntity.Alignment.RIGHT);
+
         ignoreInput = true;
         in = new Transition(context, Transition.Type.FLASH_IN, 0.5f, () -> ignoreInput = false);
         in.start();
+        context.audio.stopMusic();
     }
 
     @Override
@@ -40,6 +50,7 @@ public class TitleScreen extends Screen {
             ignoreInput = true;
             out.setCallback(() -> context.sm.replace(new SelectScreen(context)));
             out.start();
+            context.audio.playSound("click");
         }
 
     }
@@ -48,6 +59,9 @@ public class TitleScreen extends Screen {
     public void update(float dt) {
         in.update(dt);
         out.update(dt);
+
+        time += dt;
+        scale = 1 + MathUtils.sin(3 * time) * 0.1f;
     }
 
     @Override
@@ -61,9 +75,11 @@ public class TitleScreen extends Screen {
         sb.draw(pixel, 0, 152, WIDTH, 56);
 
         sb.setColor(1, 1, 1, 1);
-        Utils.drawCentered(sb, title, WIDTH / 2f, HEIGHT / 2f);
+        Utils.drawCenteredScaled(sb, title, WIDTH / 2f, HEIGHT / 2f, 1f);
 
         playButton.render(sb);
+
+        jamText.render(sb);
 
         in.render(sb);
         out.render(sb);

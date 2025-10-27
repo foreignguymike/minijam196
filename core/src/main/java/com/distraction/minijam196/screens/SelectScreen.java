@@ -43,6 +43,7 @@ public class SelectScreen extends Screen {
         }
 
         in.start();
+        context.audio.stopMusic();
     }
 
     @Override
@@ -57,6 +58,7 @@ public class SelectScreen extends Screen {
                 ignoreInput = true;
                 out.setCallback(() -> context.sm.replace(new PlayScreen(context, select.type)));
                 out.start();
+                context.audio.playSound("click");
             }
         }
 
@@ -65,6 +67,7 @@ public class SelectScreen extends Screen {
             out.setTransition(Transition.Type.FLASH_OUT);
             out.setCallback(() -> context.sm.replace(new TitleScreen(context)));
             out.start();
+            context.audio.playSound("tick");
         }
     }
 

@@ -63,6 +63,7 @@ public class PauseScreen extends Screen {
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             ignoreInput = true;
             out.start();
+            context.audio.playSound("tick");
         }
 
         m.set(Gdx.input.getX(), Gdx.input.getY(), 0);
@@ -77,6 +78,7 @@ public class PauseScreen extends Screen {
                     context.sm.replace(new PlayScreen(context, snakeType));
                 });
                 out.start();
+                context.audio.playSound("click");
             } else if (backButton.contains(m.x, m.y)) {
                 ignoreInput = true;
                 out.setTransition(Transition.Type.FLASH_OUT);
@@ -85,6 +87,7 @@ public class PauseScreen extends Screen {
                     context.sm.replace(new TitleScreen(context));
                 });
                 out.start();
+                context.audio.playSound("click");
             }
         }
     }

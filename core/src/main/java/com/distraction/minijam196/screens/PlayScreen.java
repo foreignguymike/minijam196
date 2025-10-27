@@ -173,7 +173,10 @@ public class PlayScreen extends Screen {
             player.showRange = true;
         }
 
-        menu = new Menu(context, player, this::nextTurn);
+        menu = new Menu(context, player, () -> {
+            nextTurn();
+            context.audio.playSound("endturn", 0.2f);
+        });
 
         cursor = new ImageButton(context.getImage("cursor"));
         cursor.x = cursor.y = -100;
@@ -181,6 +184,8 @@ public class PlayScreen extends Screen {
         float fieldCenter = NUM_COLS * TILE_SIZE / 2f;
         finishText = new TextEntity(context.getFont(Context.VCR20), "", fieldCenter, HEIGHT / 2f + 30, TextEntity.Alignment.CENTER);
         restartButton = new TextButton(context, "Restart", fieldCenter, HEIGHT / 2f - 30);
+
+        context.audio.playMusic("bg", 0.1f, true);
     }
 
     private void nextTurn() {
@@ -239,6 +244,7 @@ public class PlayScreen extends Screen {
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             ignoreInput = true;
             context.sm.push(new PauseScreen(context, snakeType));
+            context.audio.playSound("click");
             return;
         }
 
@@ -287,12 +293,17 @@ public class PlayScreen extends Screen {
         in.update(dt);
         out.update(dt);
 
-        if (isGameOver()) {
+        if (isGameOver() && turnPhase != TurnPhase.FINISH) {
             cam.position.set(WIDTH / 2f, HEIGHT / 2f, 0);
             cam.update();
             turnPhase = TurnPhase.FINISH;
-            if (player.dead) finishText.setText("You lose!");
-            else finishText.setText("Victory!");
+            if (player.dead) {
+                finishText.setText("You lose!");
+                context.audio.playSound("lose", 0.2f);
+            } else {
+                finishText.setText("Victory!");
+                context.audio.playSound("finish", 0.2f);
+            }
         }
 
         menu.update(dt);
@@ -312,6 +323,7 @@ public class PlayScreen extends Screen {
                 }
             }
             if (!explodingBombs.isEmpty()) {
+                context.audio.playSound("explosion", 0.1f);
                 time = 0.5f;
                 for (Snake s : snakes) {
                     s.checkHit(explodingBombs);
@@ -344,6 +356,7 @@ public class PlayScreen extends Screen {
             Snake s = snakes.get(i);
             s.update(dt);
         }
+        for (Bomb b : bombs) b.update(dt);
         for (int i = particles.size() - 1; i >= 0; i--) {
             Particle p = particles.get(i);
             p.update(dt);

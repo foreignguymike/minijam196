@@ -5,7 +5,9 @@ import static com.distraction.minijam196.Constants.TILE_SIZE;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
+import com.distraction.minijam196.Animation;
 import com.distraction.minijam196.Context;
+import com.distraction.minijam196.Utils;
 
 public class Bomb extends GridEntity {
 
@@ -19,10 +21,10 @@ public class Bomb extends GridEntity {
             this.name = name;
             this.range = range;
         }
-
     }
 
-    private final TextureRegion image;
+    private final Context context;
+    private final Animation animation;
 
     public final BombType type;
     public int countdown;
@@ -32,13 +34,19 @@ public class Bomb extends GridEntity {
 
     private final TextEntity countdownText;
 
+    private float scale;
+
     public Bomb(Context context, BombType type, int delay, int startRow, int startCol) {
+        this.context = context;
         this.type = type;
         this.countdown = delay;
         x = startCol * TILE_SIZE;
         y = startRow * TILE_SIZE;
 
-        image = context.getImage(type.name);
+        animation = new Animation(context.getImage("bomb").split(20, 25)[0], 0.033f);
+        w = animation.getImage().getRegionWidth();
+        h = animation.getImage().getRegionHeight();
+
         countdownText = new TextEntity(context.getFont(Context.M5X716), "" + countdown, x, y, TextEntity.Alignment.CENTER);
     }
 
@@ -67,11 +75,18 @@ public class Bomb extends GridEntity {
 
     @Override
     public void update(float dt) {
+        animation.update(dt);
+        boolean atDest = atDestination();
         moveToDestination(dt);
+        if (!atDest && atDestination()) {
+            context.audio.playSound("bombland", 0.2f);
+        }
 
         float distLeft = calculateDistance(x, y, col * TILE_SIZE, row * TILE_SIZE);
         float percent = distLeft / totalDist;
         jumpy = MathUtils.sin(MathUtils.PI * percent) * 70;
+
+        scale = 1 + 1.2f * jumpy / 70;
 
         countdownText.x = x + 9;
         countdownText.y = y + jumpy + 9;
@@ -80,7 +95,8 @@ public class Bomb extends GridEntity {
     @Override
     public void render(SpriteBatch sb) {
         sb.setColor(1, 1, 1, 1);
-        sb.draw(image, x, y + jumpy);
+//        sb.draw(image, x, y + jumpy);
+        Utils.drawCenteredScaled(sb, animation.getImage(), x + w / 2, y + h / 2 + jumpy, scale);
         countdownText.render(sb);
     }
 }

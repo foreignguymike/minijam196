@@ -223,9 +223,7 @@ public class Snake extends GridEntity {
             }
 
             if (isValid(tr, tc)) {
-                bombsRemaining--;
-                bomb = new Bomb(context, Bomb.BombType.BOMB, getAliveCount(), head.row, head.col);
-                bomb.setDest(tr, tc);
+                throwBomb(head.row, head.col, tr, tc);
                 return true;
             }
 
@@ -240,9 +238,7 @@ public class Snake extends GridEntity {
                         dist = Math.abs(r - head.row) + Math.abs(c - head.col);
                         if (dist > range) continue;
                         if (isValid(r, c)) {
-                            bombsRemaining--;
-                            bomb = new Bomb(context, Bomb.BombType.BOMB, getAliveCount(), head.row, head.col);
-                            bomb.setDest(r, c);
+                            throwBomb(head.row, head.col, r, c);
                             return true;
                         }
                     }
@@ -258,9 +254,7 @@ public class Snake extends GridEntity {
             int dist = Math.abs(tr - head.row) + Math.abs(tc - head.col);
             if (dist > range) return;
             if (isValid(tr, tc)) {
-                bombsRemaining--;
-                bomb = new Bomb(context, Bomb.BombType.BOMB, getAliveCount(), head.row, head.col);
-                bomb.setDest(tr, tc);
+                throwBomb(head.row, head.col, tr, tc);
             }
         }
     }
@@ -271,6 +265,13 @@ public class Snake extends GridEntity {
 
     public float getHeadCol() {
         return bodies.get(0).col;
+    }
+
+    private void throwBomb(int startRow, int startCol, int endRow, int endCol) {
+        bombsRemaining--;
+        bomb = new Bomb(context, Bomb.BombType.BOMB, getAliveCount(), startRow, startCol);
+        bomb.setDest(endRow, endCol);
+        context.audio.playSound("bombthrow", 0.2f);
     }
 
     private int getAliveCount() {

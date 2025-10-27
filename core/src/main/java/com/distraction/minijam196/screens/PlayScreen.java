@@ -281,6 +281,7 @@ public class PlayScreen extends Screen {
                     ignoreInput = true;
                     out.setCallback(() -> context.sm.replace(new PlayScreen(context, snakeType)));
                     out.start();
+                    context.audio.playSound("click");
                 }
             }
             restartButton.setHover(restartButton.contains(m.x, m.y));

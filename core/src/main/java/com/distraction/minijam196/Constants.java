@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 
 public class Constants {
 
-    public static final String TITLE = "unknown";
+    public static final String TITLE = "Slither Boom";
     public static final int WIDTH = 640;
     public static final int HEIGHT = 360;
     public static final int SCALE = 2;
